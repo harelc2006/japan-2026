@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0f">
+<title>Japan Trip - Leg 2: Osaka &amp; Kyoto</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --bg:#0a0a0f; --card:#14141b; --card2:#1b1b25; --line:#262633;
+    --ink:#ececf1; --muted:#9a9aad; --accent:#ff4d5a;
+    --d1:#ff4d5a; --d2:#ff9f1c; --d3:#3b82f6; --d4:#10b981; --d5:#a855f7;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  a { color:inherit; }
+
+  header { position:relative; overflow:hidden; padding:34px 18px 26px; background:radial-gradient(circle at 85% 20%, rgba(255,77,90,.35), transparent 55%), linear-gradient(160deg,#1a1a24,#0a0a0f); border-bottom:1px solid var(--line); }
+  header .kanji { position:absolute; right:12px; top:-14px; font-size:6rem; font-weight:800; color:rgba(255,255,255,.05); line-height:1; pointer-events:none; }
+  header .eyebrow { color:var(--accent); font-size:.78rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+  header h1 { margin:6px 0 6px; font-size:1.9rem; letter-spacing:-.01em; }
+  header p { margin:0; color:var(--muted); font-size:.95rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .chip { background:rgba(255,255,255,.07); border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:.82rem; }
+
+  nav { position:sticky; top:0; z-index:1000; display:flex; gap:8px; overflow-x:auto; padding:10px 12px; background:rgba(10,10,15,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  nav a { flex:0 0 auto; text-decoration:none; font-size:.85rem; font-weight:600; padding:6px 14px; border-radius:99px; background:var(--card2); border:1px solid var(--line); }
+  nav a:active { background:var(--accent); }
+
+  main { max-width:760px; margin:0 auto; padding:6px 12px 20px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin:14px 0; scroll-margin-top:60px; }
+  .card h2 { margin:0 0 2px; font-size:1.2rem; }
+  .date { color:var(--muted); font-size:.85rem; margin-bottom:10px; }
+
+  .day-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .badge { flex:0 0 auto; width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.8rem; color:#fff; background:var(--c, var(--accent)); text-align:center; line-height:1.1; }
+  .steps { display:inline-block; background:rgba(59,130,246,.16); color:#8ab4ff; font-size:.8rem; font-weight:600; padding:3px 11px; border-radius:99px; margin:2px 0 12px; }
+
+  .timeline { position:relative; margin-left:6px; padding-left:16px; border-left:2px solid var(--line); }
+  .slot { position:relative; display:flex; gap:12px; padding:8px 0 10px; }
+  .slot::before { content:""; position:absolute; left:-23px; top:14px; width:10px; height:10px; border-radius:50%; background:var(--c, var(--accent)); box-shadow:0 0 0 3px var(--card); }
+  .time { flex:0 0 74px; font-weight:700; font-size:.85rem; color:var(--c, var(--accent)); padding-top:1px; }
+  .what b { display:block; font-size:.98rem; }
+  .what span { color:var(--muted); font-size:.9rem; }
+  .what b .tag { margin-left:6px; }
+  .what a.pic { display:inline-block; margin-top:3px; font-size:.82rem; font-weight:600; color:#8ab4ff; text-decoration:none; }
+
+  .tag { display:inline-block; font-size:.68rem; font-weight:600; padding:1px 8px; border-radius:99px; vertical-align:middle; background:rgba(139,92,246,.2); color:#c4b5fd; }
+  .tag.opt { background:rgba(16,185,129,.18); color:#6ee7b7; }
+  .tag.book { background:rgba(239,68,68,.2); color:#fca5a5; }
+  .tag.food { background:rgba(255,159,28,.2); color:#ffd699; }
+  .tag.move { background:rgba(255,255,255,.1); color:#cfcfdc; }
+
+  .note { background:rgba(255,159,28,.12); border:1px solid rgba(255,159,28,.3); color:#ffd699; border-radius:10px; padding:9px 12px; margin-top:8px; font-size:.88rem; }
+  .route { display:inline-block; margin-top:10px; text-decoration:none; font-size:.85rem; font-weight:600; padding:8px 14px; border-radius:10px; background:var(--card2); border:1px solid var(--line); }
+  .route:active { background:var(--accent); }
+
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  td, th { text-align:left; padding:8px 4px; border-top:1px solid var(--line); vertical-align:top; }
+  tr:first-child td { border-top:none; }
+  th { color:var(--muted); font-weight:600; border-top:none; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; }
+  td:first-child { color:var(--muted); width:34%; }
+  ul { margin:8px 0 0; padding-left:20px; }
+  li { margin:5px 0; }
+
+  .daymap { height:320px; border-radius:12px; margin-top:10px; border:1px solid var(--line); background:#e8e4dc; }
+
+  .pin { width:30px; height:30px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--c); border:2px solid #fff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.45); }
+  .pin span { transform:rotate(45deg); color:#fff; font:700 12px -apple-system,"Segoe UI",sans-serif; }
+  .leaflet-popup-content-wrapper { background:var(--card); color:var(--ink); border-radius:12px; }
+  .leaflet-popup-tip { background:var(--card); }
+  .leaflet-popup-content a { color:#8ab4ff; font-weight:600; }
+
+  footer { text-align:center; color:var(--muted); font-size:.8rem; padding:10px 16px 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kanji">大阪</div>
+  <div class="eyebrow">Japan 2026 &middot; Leg 2 of 3</div>
+  <h1>Osaka &amp; Kyoto</h1>
+  <p>Mon Oct 26 &ndash; Sat Oct 31 &middot; 5 nights &middot; Hotel Geometiq Osaka Umeda</p>
+  <div class="chips"><span class="chip">Kyoto temples</span><span class="chip">Street food</span><span class="chip">Water bus</span><span class="chip">Aquarium</span><span class="chip">Night cruise</span></div>
+</header>
+
+<nav>
+  <a href="#info">Info</a>
+  <a href="#day1">Oct 26</a>
+  <a href="#day2">Oct 27</a>
+  <a href="#day3">Oct 28</a>
+  <a href="#day4">Oct 29</a>
+  <a href="#day5">Oct 30</a>
+  <a href="#day6">Oct 31</a>
+  <a href="#steps">Steps</a>
+  <a href="#todo">Checklist</a>
+</nav>
+
+<main>
+
+<div class="card" id="info">
+  <h2>Hotel &amp; Logistics</h2>
+  <table>
+    <tr><td>Hotel</td><td>HOTEL GEOMETIQ Osaka Umeda, an Ascend Collection Hotel<br>Kita-ku Sonezaki 2-15-23, Osaka 530-0051</td></tr>
+    <tr><td>Check-in / out</td><td>From 15:00 (Oct 26) / by 11:00 (Oct 31)</td></tr>
+    <tr><td>Room</td><td>Superior Twin, non-smoking, no meals</td></tr>
+    <tr><td>Booking</td><td>hotel tel +81 6 6311 1551</td></tr>
+    <tr><td>Paid</td><td>Already paid in full. Local accommodation tax is paid at the hotel. Free cancellation until Oct 20, 23:59 JST.</td></tr>
+    <tr><td>Why this base</td><td>Osaka Station and Umeda are close by. Kyoto is about 30 minutes from Osaka Station on the JR Special Rapid, so both Kyoto days are day trips with no hotel change.</td></tr>
+  </table>
+</div>
+
+<div class="card" id="day1" style="--c:var(--d1)">
+  <div class="day-head"><div class="badge">Oct 26</div><div><h2>Arrive &amp; Aquarium</h2><div class="date" style="margin:0">Mon, Oct 26 &middot; early start so the day is not lost to travel</div></div></div>
+  <div class="steps">Est. ~10,000 steps (~7 km), including stations with luggage</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">~7:30</div><div class="what"><b>Check out of Shinjuku<span class="tag move">travel</span></b><span>Check-out is before 11:00, so an early start is fine. Chuo Line from Shinjuku to Tokyo Station is about 15 minutes.</span></div></div>
+    <div class="slot"><div class="time">~8:30</div><div class="what"><b>Shinkansen Tokyo to Shin-Osaka<span class="tag book">book seats</span></b><span>About 2.5 hours on the fast Nozomi, arriving around 11:00. Book reserved seats and check the large-suitcase rule. Buy a bento at Tokyo Station for the train.</span></div></div>
+    <div class="slot"><div class="time">~11:30</div><div class="what"><b>Drop bags at the hotel<span class="tag move">travel</span></b><span>Check-in is not until 15:00, so ask the hotel to hold the luggage. JR from Shin-Osaka to Osaka Station, then a short walk.</span></div></div>
+    <div class="slot"><div class="time">~12:30</div><div class="what"><b>Lunch around Umeda<span class="tag food">food</span></b><span>Easy meal near the hotel while waiting for check-in.</span></div></div>
+    <div class="slot"><div class="time">~15:30</div><div class="what"><b>Check in and rest</b><span>Back at the hotel from 15:00. Short rest.</span></div></div>
+    <div class="slot"><div class="time">~17:30</div><div class="what"><b>Osaka Aquarium Kaiyukan</b><span>One of the world's biggest aquariums, built around a huge Pacific Ocean tank with a whale shark. Open 10:00 to 20:00 in October with last entry at 19:00, so an evening visit works. Allow about 2 hours. JR Loop Line to Bentencho, then the Chuo Line to Osakako, about 30 minutes.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Osaka+Aquarium+Kaiyukan+whale+shark" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~19:45</div><div class="what"><b>Dinner on the way back<span class="tag food">food</span></b><span>Near the aquarium harbor area or back around Umeda. Early night.</span></div></div>
+    <div class="slot"><div class="time">Optional</div><div class="what"><b>Umeda Sky Building, Floating Garden Observatory<span class="tag opt">optional</span></b><span>Two towers joined at the top by an open-air circular walkway with night views. Close to the hotel, so an easy option if you have energy left, or on the morning of Oct 31.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Umeda+Sky+Building+Floating+Garden" target="_blank" rel="noopener">See photos</a></div></div>
+  </div>
+  <div class="note">Long day because of the early start. The shinkansen ride is your rest. If tired, skip the aquarium.</div>
+  <div class="daymap" id="map1"></div>
+  <a class="route" data-day="1" target="_blank" rel="noopener">Open Oct 26 route in Google Maps</a>
+</div>
+
+<div class="card" id="day2" style="--c:var(--d2)">
+  <div class="day-head"><div class="badge">Oct 27</div><div><h2>Kyoto: Fushimi Inari to Nishiki</h2><div class="date" style="margin:0">Tue, Oct 27 &middot; Kyoto day 1, south and east Kyoto</div></div></div>
+  <div class="steps">Est. ~16,000 steps (~11.5 km), or ~19,000 with the Philosopher's Path</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">7:30</div><div class="what"><b>Osaka to Fushimi Inari<span class="tag move">travel</span></b><span>JR Special Rapid to Kyoto (about 30 minutes), then the JR Nara Line to Inari Station (5 minutes).</span></div></div>
+    <div class="slot"><div class="time">8:30-10:30</div><div class="what"><b>Fushimi Inari Taisha</b><span>Thousands of red torii gates winding up a forested hill. Go early to avoid crowds. The lower part is easy, and the full climb has many stairs, so go as far as you like and turn back.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Fushimi+Inari+Taisha" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~11:15</div><div class="what"><b>Kiyomizu-dera</b><span>A big wooden temple on a hillside with a large terrace and city views. The approach is uphill and busy, so take your time.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Kiyomizu-dera" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">12:45</div><div class="what"><b>Sannenzaka &amp; Ninenzaka, lunch<span class="tag food">food</span></b><span>Stone-paved lanes of old shops and teahouses on the way down from Kiyomizu-dera. Walking here is part of the fun. Good place for lunch, sweets and tea.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Sannenzaka+Ninenzaka+Kyoto" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~14:00</div><div class="what"><b>Gion &amp; Hanamikoji Street</b><span>Old wooden teahouses. Geiko and maiko are most often seen around dusk, so you may or may not spot one at this time.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Gion+Hanamikoji+Kyoto" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~15:30</div><div class="what"><b>Nishiki Market<span class="tag food">food</span></b><span>A narrow covered market, known as Kyoto's kitchen, with pickles, tofu snacks and skewers. A short walk from Gion. Many stalls close around 17:00, so arrive by 15:30.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Nishiki+Market+Kyoto" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~17:00</div><div class="what"><b>Back to Osaka<span class="tag move">travel</span></b><span>Hankyu Line from Kawaramachi to Umeda is about 45 minutes. Dinner near the hotel.</span></div></div>
+    <div class="slot"><div class="time">Optional</div><div class="what"><b>Philosopher's Path &amp; Nanzen-ji<span class="tag opt">nice to have</span></b><span>A calm canal path of about 2 km lined with trees, running between Nanzen-ji temple and Ginkaku-ji. It's quiet and scenic, but it's in the north-east, away from Nishiki. It does not fit with Nishiki the same afternoon, so swap it in for Gion and Nishiki if you prefer quiet to markets. Needs about 2 hours.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Philosophers+Path+Kyoto" target="_blank" rel="noopener">See photos</a></div></div>
+  </div>
+  <div class="note">Long day. If tired, skip Gion and go from the Sannenzaka lanes straight to Nishiki Market.</div>
+  <div class="daymap" id="map2"></div>
+  <a class="route" data-day="2" target="_blank" rel="noopener">Open Oct 27 route in Google Maps</a>
+</div>
+
+<div class="card" id="day3" style="--c:var(--d3)">
+  <div class="day-head"><div class="badge">Oct 28</div><div><h2>Water Bus, Castle &amp; Old Osaka</h2><div class="date" style="margin:0">Wed, Oct 28 &middot; the castle area first, then temple, shopping street and river</div></div></div>
+  <div class="steps">Est. ~17,000 steps (~12 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">~9:15</div><div class="what"><b>Hotel to Osaka Castle Port<span class="tag move">travel</span></b><span>JR Loop Line from Osaka Station to Osakajokoen, about 15 minutes. Check the exact pier on the booking site.</span></div></div>
+    <div class="slot"><div class="time">10:00-10:55</div><div class="what"><b>Osaka Water Bus (Aqualiner)<span class="tag book">book ticket</span></b><span>An hour-long boat loop through the city's rivers and canals, passing under bridges with views of the castle. Departs hourly from 10:00 to 16:00 at Osaka Castle Port and takes about 55 minutes. It runs in daytime only, so it can't be a night cruise. Check the schedule, since service changes by season.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Osaka+Aqualiner+water+bus" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~11:15</div><div class="what"><b>Osaka Castle</b><span>A large castle with moats, stone walls and a big park. Easy walking around the park. The castle interior has many steps, so it's optional.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Osaka+Castle" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~12:45</div><div class="what"><b>Lunch near the castle<span class="tag food">food</span></b><span>Park food stalls, or a short walk toward the next stop.</span></div></div>
+    <div class="slot"><div class="time">~13:30</div><div class="what"><b>Osaka Museum of History</b><span>A museum beside the castle park, with life-size recreations of old Osaka streets. From its upper floors you get a view of the castle and the ruins of the old Naniwa Palace. Check opening hours and closed days.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Osaka+Museum+of+History" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~15:00</div><div class="what"><b>Shitenno-ji Temple</b><span>One of Japan's oldest Buddhist temples, founded in the 6th century, with a five-story pagoda and a flat layout. A short subway ride south of the castle on the Tanimachi Line.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Shitenno-ji+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~16:15</div><div class="what"><b>Osaka Tenmangu &amp; Tenjinbashisuji shopping street<span class="tag opt">browse</span></b><span>A shrine, then one of Japan's longest covered shopping arcades with local snacks, small shops and eateries. Walk as much as you like, since it's flat and fun.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Tenjinbashisuji+Shopping+Street+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~17:30</div><div class="what"><b>Nakanoshima Rose Garden<span class="tag opt">nice to have</span></b><span>A riverside garden on Nakanoshima island, with roses that bloom in autumn, and old brick and stone buildings around it. An easy walk toward Umeda at dusk.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Nakanoshima+Rose+Garden+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">Evening</div><div class="what"><b>Dinner near the hotel<span class="tag food">food</span></b></div></div>
+  </div>
+  <div class="note">This is now a full day. If tired, drop Shitenno-ji first, then the rose garden. I removed Nakazakicho because its cafes close early, around 18:00, and it no longer fits the schedule.</div>
+  <div class="daymap" id="map3"></div>
+  <a class="route" data-day="3" target="_blank" rel="noopener">Open Oct 28 route in Google Maps</a>
+</div>
+
+<div class="card" id="day4" style="--c:var(--d4)">
+  <div class="day-head"><div class="badge">Oct 29</div><div><h2>Kyoto: Arashiyama &amp; Golden Pavilion</h2><div class="date" style="margin:0">Thu, Oct 29 &middot; Kyoto day 2, west and north Kyoto</div></div></div>
+  <div class="steps">Est. ~14,000 steps (~10 km), or ~15,000 with the scenic train</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">7:30</div><div class="what"><b>Osaka to Arashiyama<span class="tag move">travel</span></b><span>JR Special Rapid to Kyoto, then the JR Sagano Line to Saga-Arashiyama. About 1 hour 15 minutes in total.</span></div></div>
+    <div class="slot"><div class="time">~8:45</div><div class="what"><b>Arashiyama Bamboo Grove</b><span>A tall bamboo path that is quiet and atmospheric early in the morning and crowded later. Mostly flat.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Arashiyama+Bamboo+Grove" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~9:30</div><div class="what"><b>Tenryu-ji</b><span>A Zen temple with a large pond garden, next to the grove. Allow about an hour.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Tenryu-ji+Kyoto+garden" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~10:30</div><div class="what"><b>Togetsukyo Bridge &amp; Arashiyama main street<span class="tag food">food</span></b><span>A long wooden bridge over the river, then a street of snack stalls and small shops. Easy walking and a good place for an early lunch.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Togetsukyo+Bridge+Arashiyama" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~11:30</div><div class="what"><b>Sagano Romantic Train<span class="tag opt">nice to have</span><span class="tag book">check calendar</span></b><span>A scenic open-window train of about 25 minutes through a river gorge, from Arashiyama to Kameoka. It's one-way, so return by JR from Kameoka to Kyoto. It normally runs from March to late December and is usually closed on Wednesdays, so Thursday Oct 29 should normally be fine, but confirm the official calendar and timetable and book ahead.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Sagano+Romantic+Train+Arashiyama" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~13:00</div><div class="what"><b>To Kinkaku-ji<span class="tag move">travel</span></b><span>Without the train, leave Arashiyama around 13:00 by bus or tram, about 40 minutes. With the train, return via Kyoto and take a bus, arriving around 14:15.</span></div></div>
+    <div class="slot"><div class="time">~13:45</div><div class="what"><b>Kinkaku-ji (Golden Pavilion)</b><span>A temple covered in gold leaf, reflected in a pond. It's a short flat walk through the garden, about an hour.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Kinkaku-ji+Golden+Pavilion" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~15:15</div><div class="what"><b>Back to Osaka<span class="tag move">travel</span></b><span>Bus to Kyoto Station, then the JR train to Osaka. Later if you took the scenic train.</span></div></div>
+  </div>
+  <div class="daymap" id="map4"></div>
+  <a class="route" data-day="4" target="_blank" rel="noopener">Open Oct 29 route in Google Maps</a>
+</div>
+
+<div class="card" id="day5" style="--c:var(--d5)">
+  <div class="day-head"><div class="badge">Oct 30</div><div><h2>South Osaka, Food &amp; Dotonbori Night</h2><div class="date" style="margin:0">Fri, Oct 30 &middot; south to Dotonbori, ending with the night cruise</div></div></div>
+  <div class="steps">Est. ~16,500 steps (~12 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">8:30</div><div class="what"><b>Hotel to Sumiyoshi Taisha<span class="tag move">travel</span></b><span>Subway to Namba, then the Nankai Line to Sumiyoshitaisha, about 40 minutes.</span></div></div>
+    <div class="slot"><div class="time">~9:15</div><div class="what"><b>Sumiyoshi Taisha</b><span>One of Japan's oldest shrines, with a famous arched bridge. Quieter than Kyoto.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Sumiyoshi+Taisha+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~11:15</div><div class="what"><b>Shinsekai &amp; Tsutenkaku Tower, lunch<span class="tag food">food</span></b><span>A retro neighborhood with neon signs and kushikatsu (deep-fried skewers) restaurants.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Shinsekai+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~14:00</div><div class="what"><b>Kuromon Market<span class="tag food">food</span></b><span>A covered food market with seafood, wagyu skewers and fruit. Many stalls close by about 17:00, so go in the afternoon.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Kuromon+Market+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~15:30</div><div class="what"><b>Shinsaibashi &amp; Amerikamura<span class="tag opt">browse</span></b><span>A long covered shopping arcade and a youth fashion district beside it. Shopping, snacks and street style, and the walk is part of the fun.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Shinsaibashi+Amerikamura+Osaka" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~18:00</div><div class="what"><b>Dinner in Dotonbori<span class="tag food">food</span></b><span>Takoyaki, okonomiyaki and ramen stalls and restaurants along the canal.</span></div></div>
+    <div class="slot"><div class="time">~19:15</div><div class="what"><b>Hozenji Yokocho</b><span>A small stone alley with lanterns and a moss-covered Buddha statue, tucked beside Dotonbori.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Hozenji+Yokocho" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~19:45</div><div class="what"><b>Dotonbori night river cruise<span class="tag book">book ticket</span></b><span>See the neon signs and the Glico running man from the water. Check the exact length and departure times when booking, since I believe the standard Dotonbori cruise is shorter than an hour. Then walk the lit-up canal.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Dotonbori+night+river+cruise" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~21:00</div><div class="what"><b>Dotonbori at night</b><span>The Glico sign and neon canal street are best now. Then head back to the hotel.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Dotonbori+Osaka+night" target="_blank" rel="noopener">See photos</a></div></div>
+  </div>
+  <div class="note">This is the heaviest Osaka day. If tired, drop Sumiyoshi Taisha first.</div>
+  <div class="daymap" id="map5"></div>
+  <a class="route" data-day="5" target="_blank" rel="noopener">Open Oct 30 route in Google Maps</a>
+</div>
+
+<div class="card" id="day6" style="--c:#a1a1b5">
+  <div class="day-head"><div class="badge">Oct 31</div><div><h2>Back to Tokyo (Ueno)</h2><div class="date" style="margin:0">Sat, Oct 31 &middot; continues in Leg 3</div></div></div>
+  <div class="steps">Est. ~3,000 steps (~2 km) plus stations</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">Before 11:00</div><div class="what"><b>Check out</b><span>Last bit of shopping near Umeda if time allows.</span></div></div>
+    <div class="slot"><div class="time">~11:30</div><div class="what"><b>Shinkansen to Tokyo<span class="tag book">book seats</span></b><span>About 2.5 hours, then the Yamanote Line to Ueno. APA Hotel Keisei Ueno-Ekimae checks in from 15:00.</span></div></div>
+  </div>
+</div>
+
+<div class="card" id="steps">
+  <h2>Steps Overview</h2>
+  <div class="date">Rough estimates at about 1,400 steps per km, including station transfers. Real numbers depend on pace and detours.</div>
+  <table>
+    <tr><th>Day</th><th>Steps</th><th>Distance</th></tr>
+    <tr><td>Mon Oct 26</td><td>~10,000</td><td>~7 km</td></tr>
+    <tr><td>Tue Oct 27</td><td>~16,000 to 19,000</td><td>~11.5 to 13.5 km</td></tr>
+    <tr><td>Wed Oct 28</td><td>~17,000</td><td>~12 km</td></tr>
+    <tr><td>Thu Oct 29</td><td>~14,000 to 15,000</td><td>~10 to 10.5 km</td></tr>
+    <tr><td>Fri Oct 30</td><td>~16,500</td><td>~12 km</td></tr>
+    <tr><td>Sat Oct 31</td><td>~3,000</td><td>~2 km</td></tr>
+  </table>
+</div>
+
+<div class="card" id="todo">
+  <h2>Booking Checklist</h2>
+  <ul>
+    <li>Shinkansen Tokyo to Osaka for Oct 26 (early train, around 8:30) and Osaka to Tokyo for Oct 31, with the large-suitcase rule checked</li>
+    <li>Osaka Aquarium Kaiyukan for Oct 26 evening: check tickets and last entry (19:00)</li>
+    <li>Osaka Water Bus (Aqualiner) for Oct 28: check the schedule and book the 10:00 sailing</li>
+    <li>Sagano Romantic Train for Oct 29: confirm the official calendar and timetable, usually closed Wednesdays</li>
+    <li>Dotonbori night cruise for Oct 30: check length, times and whether to book ahead</li>
+    <li>Osaka Museum of History: check opening hours and closed days</li>
+    <li>Kinkaku-ji, Tenryu-ji, Kiyomizu-dera: check opening hours and entry fees</li>
+    <li>Nishiki Market and Kuromon Market: check closing times, since many stalls close early</li>
+    <li>Osaka hotel free cancellation ends Oct 20, 23:59 JST</li>
+    <li>Verify opening hours on official sites before each day</li>
+  </ul>
+</div>
+
+</main>
+<footer>Harel &amp; Menashe &middot; Japan 2026</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var days = {
+    0: { label: "Hotel", color: "#111827" },
+    1: { label: "Oct 26", color: "#ff4d5a" },
+    2: { label: "Oct 27", color: "#ff9f1c" },
+    3: { label: "Oct 28", color: "#3b82f6" },
+    4: { label: "Oct 29", color: "#10b981" },
+    5: { label: "Oct 30", color: "#a855f7" }
+  };
+  var hotel = ["HOTEL GEOMETIQ Osaka Umeda", 34.6995, 135.4940, "Osaka"];
+  var stops = {
+    1: [
+      ["Osaka Aquarium Kaiyukan", 34.6545, 135.4290, "Osaka"],
+      ["Umeda Sky Building (optional)", 34.7054, 135.4900, "Osaka"]
+    ],
+    2: [
+      ["Fushimi Inari Taisha", 34.9671, 135.7727, "Kyoto"],
+      ["Kiyomizu-dera", 34.9949, 135.7850, "Kyoto"],
+      ["Sannenzaka", 34.9985, 135.7807, "Kyoto"],
+      ["Gion Hanamikoji Street", 35.0037, 135.7757, "Kyoto"],
+      ["Nishiki Market", 35.0050, 135.7649, "Kyoto"],
+      ["Philosopher's Path (optional)", 35.0264, 135.7955, "Kyoto"]
+    ],
+    3: [
+      ["Osaka Castle Port Aqualiner", 34.6948, 135.5318, "Osaka"],
+      ["Osaka Castle", 34.6873, 135.5262, "Osaka"],
+      ["Osaka Museum of History", 34.6812, 135.5255, "Osaka"],
+      ["Shitenno-ji", 34.6542, 135.5160, "Osaka"],
+      ["Osaka Tenmangu", 34.6980, 135.5113, "Osaka"],
+      ["Tenjinbashisuji Shopping Street", 34.7003, 135.5112, "Osaka"],
+      ["Nakanoshima Rose Garden", 34.6930, 135.5080, "Osaka"]
+    ],
+    4: [
+      ["Arashiyama Bamboo Grove", 35.0170, 135.6713, "Kyoto"],
+      ["Tenryu-ji", 35.0157, 135.6738, "Kyoto"],
+      ["Togetsukyo Bridge", 35.0094, 135.6777, "Kyoto"],
+      ["Sagano Romantic Train (optional)", 35.0180, 135.6757, "Kyoto"],
+      ["Kinkaku-ji", 35.0394, 135.7292, "Kyoto"]
+    ],
+    5: [
+      ["Sumiyoshi Taisha", 34.6128, 135.4929, "Osaka"],
+      ["Tsutenkaku Tower", 34.6525, 135.5063, "Osaka"],
+      ["Kuromon Market", 34.6623, 135.5064, "Osaka"],
+      ["Amerikamura", 34.6727, 135.4982, "Osaka"],
+      ["Hozenji Yokocho", 34.6685, 135.5030, "Osaka"],
+      ["Dotonbori", 34.6687, 135.5013, "Osaka"]
+    ]
+  };
+
+  function gmapsSearch(name, city) {
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " " + city);
+  }
+  function pinIcon(color, text) {
+    return L.divIcon({
+      className: "",
+      html: '<div class="pin" style="--c:' + color + '"><span>' + text + '</span></div>',
+      iconSize: [30, 30], iconAnchor: [15, 34], popupAnchor: [0, -32]
+    });
+  }
+  function popup(name, label, city) {
+    return "<b>" + name + "</b><br>" + label + '<br><a href="' + gmapsSearch(name, city) + '" target="_blank" rel="noopener">Open in Google Maps</a>';
+  }
+
+  Object.keys(stops).forEach(function (d) {
+    var map = L.map("map" + d);
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19, attribution: "Tiles &copy; Esri"
+    }).addTo(map);
+    var pts = [[hotel[1], hotel[2]]];
+    L.marker([hotel[1], hotel[2]], { icon: pinIcon(days[0].color, "H"), zIndexOffset: 1000 })
+      .bindPopup(popup(hotel[0], "Hotel", hotel[3])).addTo(map);
+    stops[d].forEach(function (s, i) {
+      pts.push([s[1], s[2]]);
+      L.marker([s[1], s[2]], { icon: pinIcon(days[d].color, i + 1) })
+        .bindPopup(popup(s[0], days[d].label + " &middot; stop " + (i + 1), s[3])).addTo(map);
+    });
+    L.polyline(pts, { color: days[d].color, weight: 3, opacity: 0.55, dashArray: "6 8" }).addTo(map);
+    map.fitBounds(pts, { padding: [30, 30] });
+  });
+
+  document.querySelectorAll("a.route").forEach(function (a) {
+    var list = stops[a.dataset.day];
+    var names = list.map(function (s) { return s[0].replace(" (optional)", "") + " " + s[3]; });
+    var dest = names[names.length - 1];
+    var way = names.slice(0, -1);
+    a.href = "https://www.google.com/maps/dir/?api=1&travelmode=transit&origin=" +
+      encodeURIComponent(hotel[0] + " " + hotel[3]) + "&destination=" + encodeURIComponent(dest) +
+      (way.length ? "&waypoints=" + encodeURIComponent(way.join("|")) : "");
+  });
+</script>
+</body>
+</html>

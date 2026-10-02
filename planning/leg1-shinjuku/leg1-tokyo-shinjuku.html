@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0f">
+<title>Japan Trip - Leg 1: Shinjuku, Tokyo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --bg:#0a0a0f; --card:#14141b; --card2:#1b1b25; --line:#262633;
+    --ink:#ececf1; --muted:#9a9aad; --accent:#ff4d5a;
+    --d1:#ff4d5a; --d2:#ff9f1c; --d3:#3b82f6; --d4:#10b981;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  a { color:inherit; }
+
+  header { position:relative; overflow:hidden; padding:34px 18px 26px; background:radial-gradient(circle at 85% 20%, rgba(255,77,90,.35), transparent 55%), linear-gradient(160deg,#1a1a24,#0a0a0f); border-bottom:1px solid var(--line); }
+  header .kanji { position:absolute; right:12px; top:-14px; font-size:7rem; font-weight:800; color:rgba(255,255,255,.05); line-height:1; pointer-events:none; }
+  header .eyebrow { color:var(--accent); font-size:.78rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+  header h1 { margin:6px 0 6px; font-size:1.9rem; letter-spacing:-.01em; }
+  header p { margin:0; color:var(--muted); font-size:.95rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .chip { background:rgba(255,255,255,.07); border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:.82rem; }
+
+  nav { position:sticky; top:0; z-index:1000; display:flex; gap:8px; overflow-x:auto; padding:10px 12px; background:rgba(10,10,15,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  nav a { flex:0 0 auto; text-decoration:none; font-size:.85rem; font-weight:600; padding:6px 14px; border-radius:99px; background:var(--card2); border:1px solid var(--line); }
+  nav a:active { background:var(--accent); }
+
+  main { max-width:760px; margin:0 auto; padding:6px 12px 20px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin:14px 0; scroll-margin-top:60px; }
+  .card h2 { margin:0 0 2px; font-size:1.2rem; }
+  .date { color:var(--muted); font-size:.85rem; margin-bottom:10px; }
+
+  .day-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .badge { flex:0 0 auto; width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; background:var(--c, var(--accent)); }
+  .steps { display:inline-block; background:rgba(59,130,246,.16); color:#8ab4ff; font-size:.8rem; font-weight:600; padding:3px 11px; border-radius:99px; margin:2px 0 12px; }
+
+  .timeline { position:relative; margin-left:6px; padding-left:16px; border-left:2px solid var(--line); }
+  .slot { position:relative; display:flex; gap:12px; padding:8px 0 10px; }
+  .slot::before { content:""; position:absolute; left:-23px; top:14px; width:10px; height:10px; border-radius:50%; background:var(--c, var(--accent)); box-shadow:0 0 0 3px var(--card); }
+  .time { flex:0 0 74px; font-weight:700; font-size:.85rem; color:var(--c, var(--accent)); padding-top:1px; }
+  .what b { display:block; font-size:.98rem; }
+  .what span { color:var(--muted); font-size:.9rem; }
+  .what b .tag { margin-left:6px; }
+
+  .tag { display:inline-block; font-size:.68rem; font-weight:600; padding:1px 8px; border-radius:99px; vertical-align:middle; background:rgba(139,92,246,.2); color:#c4b5fd; }
+  .tag.opt { background:rgba(16,185,129,.18); color:#6ee7b7; }
+  .tag.book { background:rgba(239,68,68,.2); color:#fca5a5; }
+
+  .note { background:rgba(255,159,28,.12); border:1px solid rgba(255,159,28,.3); color:#ffd699; border-radius:10px; padding:9px 12px; margin-top:8px; font-size:.88rem; }
+  .route { display:inline-block; margin-top:10px; text-decoration:none; font-size:.85rem; font-weight:600; padding:8px 14px; border-radius:10px; background:var(--card2); border:1px solid var(--line); }
+  .route:active { background:var(--accent); }
+
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  td, th { text-align:left; padding:8px 4px; border-top:1px solid var(--line); vertical-align:top; }
+  tr:first-child td { border-top:none; }
+  th { color:var(--muted); font-weight:600; border-top:none; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; }
+  td:first-child { color:var(--muted); width:34%; }
+  ul { margin:8px 0 0; padding-left:20px; }
+  li { margin:5px 0; }
+
+  .daymap { height:320px; border-radius:12px; margin-top:10px; border:1px solid var(--line); background:#e8e4dc; }
+
+  .pin { width:30px; height:30px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--c); border:2px solid #fff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.45); }
+  .pin span { transform:rotate(45deg); color:#fff; font:700 12px -apple-system,"Segoe UI",sans-serif; }
+  .leaflet-popup-content-wrapper { background:var(--card); color:var(--ink); border-radius:12px; }
+  .leaflet-popup-tip { background:var(--card); }
+  .leaflet-popup-content a { color:#8ab4ff; font-weight:600; }
+
+  footer { text-align:center; color:var(--muted); font-size:.8rem; padding:10px 16px 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kanji">新宿</div>
+  <div class="eyebrow">Japan 2026 &middot; Leg 1 of 3</div>
+  <h1>Shinjuku, Tokyo</h1>
+  <p>Thu Oct 22 &ndash; Mon Oct 26 &middot; 4 nights &middot; Shinjuku Washington Hotel Annex</p>
+  <div class="chips"><span class="chip">Temples</span><span class="chip">Markets</span><span class="chip">Neon</span><span class="chip">Gardens</span></div>
+</header>
+
+<nav>
+  <a href="#info">Info</a>
+  <a href="#day1">Day 1</a>
+  <a href="#day2">Day 2</a>
+  <a href="#day3">Day 3</a>
+  <a href="#day4">Day 4</a>
+  <a href="#day5">Day 5</a>
+  <a href="#steps">Steps</a>
+  <a href="#todo">Checklist</a>
+</nav>
+
+<main>
+
+<div class="card" id="info">
+  <h2>Hotel &amp; Logistics</h2>
+  <table>
+    <tr><td>Hotel</td><td>Shinjuku Washington Hotel Annex<br>Nishishinjuku 3-2-9, Shinjuku-ku, Tokyo 160-8336</td></tr>
+    <tr><td>Check-in / out</td><td>After 14:00 (Oct 22) / before 11:00 (Oct 26)</td></tr>
+    <tr><td>Room</td><td>Standard Double, non-smoking (twin beds requested, not guaranteed)</td></tr>
+    <tr><td>Booking</td><td>hotel tel +81 3 3343 3111</td></tr>
+    <tr><td>Station to hotel</td><td>Underground pedestrian tunnel from Shinjuku Station to the hotel area. Calm and flat, no need for a taxi.</td></tr>
+    <tr><td>Arrival</td><td>EL AL LY91 lands Narita 13:20 on Oct 22</td></tr>
+  </table>
+</div>
+
+<div class="card" id="day1" style="--c:var(--d1)">
+  <div class="day-head"><div class="badge">1</div><div><h2>Neon Shinjuku</h2><div class="date" style="margin:0">Thu, Oct 22 &middot; arrival day, keep it light</div></div></div>
+  <div class="steps">Est. ~10,000 steps (~7 km), including the airport</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">13:20</div><div class="what"><b>Land at Narita</b><span>Immigration and bags take about 1 to 1.5 hours.</span></div></div>
+    <div class="slot"><div class="time">~15:00</div><div class="what"><b>Train to Shinjuku</b><span>Narita Express is about 80 minutes. From Shinjuku Station, use the underground walkway to the hotel. Expect to reach the hotel around 16:30 to 17:00.</span></div></div>
+    <div class="slot"><div class="time">17:00</div><div class="what"><b>Check in, drop bags, short rest</b></div></div>
+    <div class="slot"><div class="time">18:00</div><div class="what"><b>Omoide Yokocho (Memory Lane)</b><span>Lanterns are lit and smoke rises from the yakitori stalls. Go before the peak late rush.</span></div></div>
+    <div class="slot"><div class="time">19:30</div><div class="what"><b>East Shinjuku &amp; Kabukicho</b><span>Neon signs, street vibe, and the giant 3D cat near the east exit.</span></div></div>
+    <div class="slot"><div class="time">20:15</div><div class="what"><b>Hanazono Shrine &amp; Golden Gai<span class="tag">added</span></b><span>Small vermilion shrine next to Kabukicho, then walk through the alleys of tiny bars. Head back to the hotel and sleep early.</span></div></div>
+    <div class="slot"><div class="time">Optional</div><div class="what"><b>Tokyo Metropolitan Government Building<span class="tag opt">optional</span></b><span>Free 45th-floor night view, walkable from the hotel. Skip it if jet lag hits.</span></div></div>
+  </div>
+  <div class="daymap" id="map1"></div>
+  <a class="route" data-day="1" target="_blank" rel="noopener">Open Day 1 route in Google Maps</a>
+</div>
+
+<div class="card" id="day2" style="--c:var(--d2)">
+  <div class="day-head"><div class="badge">2</div><div><h2>Forest Shrine &amp; Shibuya</h2><div class="date" style="margin:0">Fri, Oct 23</div></div></div>
+  <div class="steps">Est. ~14,000 steps (~10 km), up to ~16,500 with the optional stops</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">8:00-9:30</div><div class="what"><b>Meiji Jingu Shrine</b><span>Go at opening for quiet gravel forest paths and few crowds.</span></div></div>
+    <div class="slot"><div class="time">9:45</div><div class="what"><b>Takeshita Street, Harajuku<span class="tag opt">if there is time</span></b><span>Right outside the shrine exit. Crowded and colorful, so only a short walk through.</span></div></div>
+    <div class="slot"><div class="time">Midday</div><div class="what"><b>Omotesando Avenue</b><span>Easy stroll.</span></div></div>
+    <div class="slot"><div class="time">Early pm</div><div class="what"><b>Nezu Museum Garden<span class="tag opt">nice to have</span></b><span>Hidden traditional garden with teahouses and ponds. Paid entry. Closed Mondays, so Friday works.</span></div></div>
+    <div class="slot"><div class="time">Afternoon</div><div class="what"><b>Cat Street to Shibuya</b><span>Walk it, then see the Shibuya Scramble.</span></div></div>
+    <div class="slot"><div class="time">Evening</div><div class="what"><b>Miyashita Park rooftop garden &amp; dinner</b></div></div>
+    <div class="slot"><div class="time">After dinner</div><div class="what"><b>Nonbei Yokocho, Shibuya<span class="tag opt">if there is time</span></b><span>Small lantern alley near Shibuya Station, a quieter version of Omoide Yokocho.</span></div></div>
+  </div>
+  <div class="daymap" id="map2"></div>
+  <a class="route" data-day="2" target="_blank" rel="noopener">Open Day 2 route in Google Maps</a>
+</div>
+
+<div class="card" id="day3" style="--c:var(--d3)">
+  <div class="day-head"><div class="badge">3</div><div><h2>Market, Cat Temple &amp; Sunset Deck</h2><div class="date" style="margin:0">Sat, Oct 24 &middot; Tsukiji moved here because many stalls are closed on Sundays</div></div></div>
+  <div class="steps">Est. ~16,500 steps (~12 km), or ~19,000 (~13.5 km) with Shimokitazawa</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">8:00-10:00</div><div class="what"><b>Tsukiji Outer Market</b><span>Street food: tamagoyaki, grilled skewers, fruit, green tea. Best early.</span></div></div>
+    <div class="slot"><div class="time">~10:00</div><div class="what"><b>Tsukiji Hongwanji Temple<span class="tag">added</span></b><span>Next to the market, free to enter, with an unusual Indian-style building.</span></div></div>
+    <div class="slot"><div class="time">~10:30</div><div class="what"><b>Hamarikyu Gardens<span class="tag">added</span></b><span>About a 15 minute walk from the market. Tidal pond and a teahouse, small entry fee.</span></div></div>
+    <div class="slot"><div class="time">Late morning</div><div class="what"><b>Gotokuji Temple</b><span>Quiet temple with thousands of white beckoning cats. Odakyu Line, flat paths. Allow about an hour of travel from Tsukiji.</span></div></div>
+    <div class="slot"><div class="time">Afternoon</div><div class="what"><b>Shimokitazawa<span class="tag opt">only if energy allows</span></b><span>Coffee, vintage shops and local streets. Skip it if the day is already heavy.</span></div></div>
+    <div class="slot"><div class="time">~16:00</div><div class="what"><b>Shibuya Sky, sunset slot<span class="tag book">book ticket</span></b><span>Sunset is around 16:50 in late October, so enter by about 16:00. Then dinner.</span></div></div>
+  </div>
+  <div class="note">This is the heaviest day. Drop Shimokitazawa first if anyone is tired, then Hamarikyu.</div>
+  <div class="daymap" id="map3"></div>
+  <a class="route" data-day="3" target="_blank" rel="noopener">Open Day 3 route in Google Maps</a>
+</div>
+
+<div class="card" id="day4" style="--c:var(--d4)">
+  <div class="day-head"><div class="badge">4</div><div><h2>Garden, teamLab &amp; Tokyo Tower Temple</h2><div class="date" style="margin:0">Sun, Oct 25</div></div></div>
+  <div class="steps">Est. ~16,000 steps (~11.5 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">9:00-10:30</div><div class="what"><b>Shinjuku Gyoen National Garden</b><span>Opens at 9:00. Peaceful autumn paths. Closed Mondays.</span></div></div>
+    <div class="slot"><div class="time">~11:00</div><div class="what"><b>Isetan Shinjuku food hall<span class="tag">added</span></b><span>Basement food hall, a short walk from the garden. Good for lunch or snacks. Check the opening time first.</span></div></div>
+    <div class="slot"><div class="time">Midday</div><div class="what"><b>teamLab Borderless, Azabudai Hills<span class="tag book">book ticket</span></b><span>Timed entry.</span></div></div>
+    <div class="slot"><div class="time">Afternoon</div><div class="what"><b>Zojo-ji Temple</b><span>600-year-old temple with its big wooden gate framing Tokyo Tower. About a 10 to 15 minute walk from Azabudai Hills.</span></div></div>
+    <div class="slot"><div class="time">Evening</div><div class="what"><b>Akasaka Hie Shrine &amp; relaxed dinner<span class="tag">added</span></b><span>Famous row of red torii gates, then dinner in Akasaka or back near Shinjuku. Pack tonight for the Osaka move.</span></div></div>
+  </div>
+  <div class="daymap" id="map4"></div>
+  <a class="route" data-day="4" target="_blank" rel="noopener">Open Day 4 route in Google Maps</a>
+</div>
+
+<div class="card" id="day5" style="--c:#a1a1b5">
+  <div class="day-head"><div class="badge">5</div><div><h2>Move to Osaka</h2><div class="date" style="margin:0">Mon, Oct 26</div></div></div>
+  <div class="steps">Est. ~2,000 steps before the train (~1.5 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">Before 11:00</div><div class="what"><b>Check out</b><span>Continues in Leg 2 (Osaka, Hotel Geometiq Umeda).</span></div></div>
+  </div>
+</div>
+
+<div class="card" id="steps">
+  <h2>Steps Overview</h2>
+  <div class="date">Rough estimates at about 1,400 steps per km, including station transfers. Real numbers depend on pace and detours.</div>
+  <table>
+    <tr><th>Day</th><th>Steps</th><th>Distance</th></tr>
+    <tr><td>Thu Oct 22</td><td>~10,000</td><td>~7 km</td></tr>
+    <tr><td>Fri Oct 23</td><td>~14,000 to 16,500</td><td>~10 to 12 km</td></tr>
+    <tr><td>Sat Oct 24</td><td>~16,500 to 19,000</td><td>~12 to 13.5 km</td></tr>
+    <tr><td>Sun Oct 25</td><td>~16,000</td><td>~11.5 km</td></tr>
+  </table>
+</div>
+
+<div class="card" id="todo">
+  <h2>Booking Checklist</h2>
+  <ul>
+    <li>Shibuya Sky, sunset slot on Oct 24: sales open 14 days ahead, so about Oct 10. Check the exact opening time on the site.</li>
+    <li>teamLab Borderless, ticket for Oct 25: usually available, so low priority. Book once plans are firm.</li>
+    <li>Nezu Museum, check ticket and entry rules for Oct 23</li>
+    <li>Narita Express to Shinjuku for Oct 22</li>
+    <li>Verify opening hours on official sites before each day</li>
+  </ul>
+</div>
+
+</main>
+<footer>Harel &amp; Menashe &middot; Japan 2026</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var days = {
+    0: { label: "Hotel", color: "#111827" },
+    1: { label: "Day 1", color: "#ff4d5a" },
+    2: { label: "Day 2", color: "#ff9f1c" },
+    3: { label: "Day 3", color: "#3b82f6" },
+    4: { label: "Day 4", color: "#10b981" }
+  };
+  var hotel = ["Shinjuku Washington Hotel Annex", 35.6916, 139.6926];
+  var stops = {
+    1: [
+      ["Omoide Yokocho", 35.6930, 139.6992],
+      ["Shinjuku 3D Cat (east exit)", 35.6914, 139.7022],
+      ["Kabukicho", 35.6955, 139.7036],
+      ["Hanazono Shrine", 35.6925, 139.7040],
+      ["Golden Gai", 35.6940, 139.7041],
+      ["Tokyo Metropolitan Government Building (optional)", 35.6896, 139.6921]
+    ],
+    2: [
+      ["Meiji Jingu", 35.6764, 139.6993],
+      ["Takeshita Street (optional)", 35.6704, 139.7054],
+      ["Omotesando", 35.6654, 139.7121],
+      ["Nezu Museum", 35.6620, 139.7183],
+      ["Cat Street", 35.6677, 139.7063],
+      ["Shibuya Scramble Crossing", 35.6595, 139.7005],
+      ["Miyashita Park", 35.6620, 139.7019],
+      ["Nonbei Yokocho (optional)", 35.6590, 139.7030]
+    ],
+    3: [
+      ["Tsukiji Outer Market", 35.6655, 139.7707],
+      ["Tsukiji Hongwanji Temple", 35.6673, 139.7728],
+      ["Hamarikyu Gardens", 35.6597, 139.7634],
+      ["Gotokuji Temple", 35.6490, 139.6460],
+      ["Shimokitazawa (optional)", 35.6613, 139.6683],
+      ["Shibuya Sky", 35.6585, 139.7022]
+    ],
+    4: [
+      ["Shinjuku Gyoen National Garden", 35.6852, 139.7101],
+      ["Isetan Shinjuku", 35.6916, 139.7041],
+      ["teamLab Borderless", 35.6612, 139.7410],
+      ["Zojo-ji Temple", 35.6575, 139.7482],
+      ["Akasaka Hie Shrine", 35.6743, 139.7364]
+    ]
+  };
+
+  function gmapsSearch(name) {
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " Tokyo");
+  }
+  function pinIcon(color, text) {
+    return L.divIcon({
+      className: "",
+      html: '<div class="pin" style="--c:' + color + '"><span>' + text + '</span></div>',
+      iconSize: [30, 30], iconAnchor: [15, 34], popupAnchor: [0, -32]
+    });
+  }
+  function popup(name, label) {
+    return "<b>" + name + "</b><br>" + label + '<br><a href="' + gmapsSearch(name) + '" target="_blank" rel="noopener">Open in Google Maps</a>';
+  }
+
+  Object.keys(stops).forEach(function (d) {
+    var map = L.map("map" + d);
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19, attribution: "Tiles &copy; Esri"
+    }).addTo(map);
+    var pts = [[hotel[1], hotel[2]]];
+    L.marker([hotel[1], hotel[2]], { icon: pinIcon(days[0].color, "H"), zIndexOffset: 1000 })
+      .bindPopup(popup(hotel[0], "Hotel")).addTo(map);
+    stops[d].forEach(function (s, i) {
+      pts.push([s[1], s[2]]);
+      L.marker([s[1], s[2]], { icon: pinIcon(days[d].color, i + 1) })
+        .bindPopup(popup(s[0], days[d].label + " &middot; stop " + (i + 1))).addTo(map);
+    });
+    L.polyline(pts, { color: days[d].color, weight: 3, opacity: 0.55, dashArray: "6 8" }).addTo(map);
+    map.fitBounds(pts, { padding: [30, 30] });
+  });
+
+  document.querySelectorAll("a.route").forEach(function (a) {
+    var list = stops[a.dataset.day];
+    var names = list.map(function (s) { return s[0].replace(" (optional)", "") + " Tokyo"; });
+    var dest = names[names.length - 1];
+    var way = names.slice(0, -1);
+    a.href = "https://www.google.com/maps/dir/?api=1&travelmode=transit&origin=" +
+      encodeURIComponent(hotel[0] + " Tokyo") + "&destination=" + encodeURIComponent(dest) +
+      (way.length ? "&waypoints=" + encodeURIComponent(way.join("|")) : "");
+  });
+</script>
+</body>
+</html>
