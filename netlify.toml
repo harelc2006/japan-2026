@@ -1,0 +1,10 @@
+# Regenerate index.html from planning/ + data/, then publish only the page itself.
+[build]
+  command = "python3 build_site.py && mkdir -p dist && cp index.html dist/"
+  publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
