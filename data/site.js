@@ -181,6 +181,15 @@ $$(".chips button").forEach(function (b) {
   };
   if (he) {
     document.documentElement.dir = "rtl";
+    var HD = { Sun: "א׳", Mon: "ב׳", Tue: "ג׳", Wed: "ד׳", Thu: "ה׳", Fri: "ו׳", Sat: "ש׳" };
+    var HF = { Sun: "יום ראשון", Mon: "יום שני", Tue: "יום שלישי", Wed: "יום רביעי", Thu: "יום חמישי", Fri: "יום שישי", Sat: "שבת" };
+    var MO = { Oct: "באוקטובר", Nov: "בנובמבר" };
+    $$(".chips button i").forEach(function (e) { if (HD[e.textContent]) { e.textContent = HD[e.textContent]; e.setAttribute("translate", "no"); } });
+    var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, list = [];
+    while ((n = w.nextNode())) if (/(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Oct|Nov) \d+/.test(n.nodeValue)) list.push(n);
+    list.forEach(function (n) {
+      n.nodeValue = n.nodeValue.replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Oct|Nov) (\d+)/g, function (m, d, mo, x) { return HF[d] + ", " + x + " " + MO[mo]; });
+    });
     window.googleTranslateElementInit = function () {
       new google.translate.TranslateElement({ pageLanguage: "en", includedLanguages: "iw", autoDisplay: false }, "gte");
     };
