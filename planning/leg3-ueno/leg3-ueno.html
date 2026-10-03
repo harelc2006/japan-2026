@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0f">
+<title>Japan Trip - Leg 3: Ueno, Tokyo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --bg:#0a0a0f; --card:#14141b; --card2:#1b1b25; --line:#262633;
+    --ink:#ececf1; --muted:#9a9aad; --accent:#ff4d5a;
+    --d1:#ff4d5a; --d2:#ff9f1c; --d3:#3b82f6; --d4:#10b981; --d5:#a855f7;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  a { color:inherit; }
+
+  header { position:relative; overflow:hidden; padding:34px 18px 26px; background:radial-gradient(circle at 85% 20%, rgba(255,77,90,.35), transparent 55%), linear-gradient(160deg,#1a1a24,#0a0a0f); border-bottom:1px solid var(--line); }
+  header .kanji { position:absolute; right:12px; top:-14px; font-size:6rem; font-weight:800; color:rgba(255,255,255,.05); line-height:1; pointer-events:none; }
+  header .eyebrow { color:var(--accent); font-size:.78rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+  header h1 { margin:6px 0 6px; font-size:1.9rem; letter-spacing:-.01em; }
+  header p { margin:0; color:var(--muted); font-size:.95rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .chip { background:rgba(255,255,255,.07); border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:.82rem; }
+
+  nav { position:sticky; top:0; z-index:1000; display:flex; gap:8px; overflow-x:auto; padding:10px 12px; background:rgba(10,10,15,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  nav a { flex:0 0 auto; text-decoration:none; font-size:.85rem; font-weight:600; padding:6px 14px; border-radius:99px; background:var(--card2); border:1px solid var(--line); }
+  nav a:active { background:var(--accent); }
+
+  main { max-width:760px; margin:0 auto; padding:6px 12px 20px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin:14px 0; scroll-margin-top:60px; }
+  .card h2 { margin:0 0 2px; font-size:1.2rem; }
+  .date { color:var(--muted); font-size:.85rem; margin-bottom:10px; }
+
+  .day-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .badge { flex:0 0 auto; width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.8rem; color:#fff; background:var(--c, var(--accent)); text-align:center; line-height:1.1; }
+  .steps { display:inline-block; background:rgba(59,130,246,.16); color:#8ab4ff; font-size:.8rem; font-weight:600; padding:3px 11px; border-radius:99px; margin:2px 0 12px; }
+
+  .timeline { position:relative; margin-left:6px; padding-left:16px; border-left:2px solid var(--line); }
+  .slot { position:relative; display:flex; gap:12px; padding:8px 0 10px; }
+  .slot::before { content:""; position:absolute; left:-23px; top:14px; width:10px; height:10px; border-radius:50%; background:var(--c, var(--accent)); box-shadow:0 0 0 3px var(--card); }
+  .time { flex:0 0 74px; font-weight:700; font-size:.85rem; color:var(--c, var(--accent)); padding-top:1px; }
+  .what b { display:block; font-size:.98rem; }
+  .what span { color:var(--muted); font-size:.9rem; }
+  .what b .tag { margin-left:6px; }
+  .what a.pic { display:inline-block; margin-top:3px; font-size:.82rem; font-weight:600; color:#8ab4ff; text-decoration:none; }
+
+  .tag { display:inline-block; font-size:.68rem; font-weight:600; padding:1px 8px; border-radius:99px; vertical-align:middle; background:rgba(139,92,246,.2); color:#c4b5fd; }
+  .tag.opt { background:rgba(16,185,129,.18); color:#6ee7b7; }
+  .tag.book { background:rgba(239,68,68,.2); color:#fca5a5; }
+  .tag.food { background:rgba(255,159,28,.2); color:#ffd699; }
+  .tag.move { background:rgba(255,255,255,.1); color:#cfcfdc; }
+
+  .note { background:rgba(255,159,28,.12); border:1px solid rgba(255,159,28,.3); color:#ffd699; border-radius:10px; padding:9px 12px; margin-top:8px; font-size:.88rem; }
+  .route { display:inline-block; margin-top:10px; text-decoration:none; font-size:.85rem; font-weight:600; padding:8px 14px; border-radius:10px; background:var(--card2); border:1px solid var(--line); }
+  .route:active { background:var(--accent); }
+
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  td, th { text-align:left; padding:8px 4px; border-top:1px solid var(--line); vertical-align:top; }
+  tr:first-child td { border-top:none; }
+  th { color:var(--muted); font-weight:600; border-top:none; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; }
+  td:first-child { color:var(--muted); width:34%; }
+  ul { margin:8px 0 0; padding-left:20px; }
+  li { margin:5px 0; }
+
+  .daymap { height:320px; border-radius:12px; margin-top:10px; border:1px solid var(--line); background:#e8e4dc; }
+
+  .pin { width:30px; height:30px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--c); border:2px solid #fff; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.45); }
+  .pin span { transform:rotate(45deg); color:#fff; font:700 12px -apple-system,"Segoe UI",sans-serif; }
+  .leaflet-popup-content-wrapper { background:var(--card); color:var(--ink); border-radius:12px; }
+  .leaflet-popup-tip { background:var(--card); }
+  .leaflet-popup-content a { color:#8ab4ff; font-weight:600; }
+
+  footer { text-align:center; color:var(--muted); font-size:.8rem; padding:10px 16px 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kanji">上野</div>
+  <div class="eyebrow">Japan 2026 &middot; Leg 3 of 3</div>
+  <h1>Ueno, Tokyo</h1>
+  <p>Sat Oct 31 &ndash; Wed Nov 4 &middot; 4 nights &middot; APA Hotel Keisei Ueno-Ekimae</p>
+  <div class="chips"><span class="chip">Senso-ji</span><span class="chip">Skytree sunset</span><span class="chip">Odaiba night</span><span class="chip">Akihabara</span><span class="chip">Roppongi night</span><span class="chip">Halloween cosplay</span></div>
+</header>
+
+<nav>
+  <a href="#info">Info</a>
+  <a href="#day1">Oct 31</a>
+  <a href="#day2">Nov 1</a>
+  <a href="#day3">Nov 2</a>
+  <a href="#day4">Nov 3</a>
+  <a href="#day5">Nov 4</a>
+  <a href="#steps">Steps</a>
+  <a href="#todo">Checklist</a>
+</nav>
+
+<main>
+
+<div class="card" id="info">
+  <h2>Hotel &amp; Logistics</h2>
+  <table>
+    <tr><td>Hotel</td><td>APA Hotel Keisei Ueno-Ekimae<br>Ueno, Taito-ku 2-14-26, Tokyo 110-0005</td></tr>
+    <tr><td>Check-in / out</td><td>From 15:00 (Oct 31) / before 10:00 (Nov 4)</td></tr>
+    <tr><td>Room</td><td>4 nights, twin beds requested</td></tr>
+    <tr><td>Booking</td><td>Agoda #685720259 &middot; hotel tel +81 3 5846 6811</td></tr>
+    <tr><td>Payment</td><td>USD 576.46, charged automatically on Oct 29. Free cancellation until Oct 31 00:00 Tokyo time, then non-refundable.</td></tr>
+    <tr><td>Why this base</td><td>Ueno Station (JR, Ginza and Hibiya lines) is next door, and Keisei Ueno Station, for the Skyliner to Narita, is close by. Every place in this plan is a short train ride away.</td></tr>
+    <tr><td>Flight home</td><td>Arkia IZ882 leaves Nov 4 at 23:00. Check-in is around 20:00.</td></tr>
+  </table>
+</div>
+
+<div class="card" id="day1" style="--c:var(--d1)">
+  <div class="day-head"><div class="badge">Oct 31</div><div><h2>Back to Tokyo &amp; Ueno</h2><div class="date" style="margin:0">Sat, Oct 31 &middot; arrive around 14:00, then the Halloween cosplay festival</div></div></div>
+  <div class="steps">Est. ~12,000 steps (~8.5 km), including stations with luggage</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">~11:30</div><div class="what"><b>Shinkansen Osaka to Tokyo<span class="tag book">book</span><span class="tag move">travel</span></b><span>About 2.5 hours, arriving around 14:00. Seats are in the Leg 2 checklist.</span></div></div>
+    <div class="slot"><div class="time">~14:15</div><div class="what"><b>Yamanote Line to Ueno<span class="tag move">travel</span></b><span>From Tokyo Station, about 10 minutes.</span></div></div>
+    <div class="slot"><div class="time">~14:30</div><div class="what"><b>Drop bags at the hotel</b><span>Check-in is from 15:00. Ask to check in early, or leave the bags at the front desk and go straight on. Quick freshen-up and costume change if you want to join in.</span></div></div>
+    <div class="slot"><div class="time">~15:30</div><div class="what"><b>To Ikebukuro<span class="tag move">travel</span></b><span>JR Yamanote Line from Ueno, about 20 minutes.</span></div></div>
+    <div class="slot"><div class="time">~16:00</div><div class="what"><b>Halloween cosplay festival, Ikebukuro<span class="tag book">check</span></b><span>Ikebukuro's Halloween Cosplay Festival is centred on Sunshine City and the Higashi-Ikebukuro streets, with thousands of cosplayers, photo areas and a parade. Check the official site for the 2026 programme, times and any entry or registration rules.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Ikebukuro+Halloween+Cosplay+Festival" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~19:00</div><div class="what"><b>Dinner in Ikebukuro<span class="tag food">food</span></b><span>Ramen, gyoza or a cafe near Sunshine City.</span></div></div>
+    <div class="slot"><div class="time">~21:00</div><div class="what"><b>Back to Ueno<span class="tag opt">optional</span></b><span>JR Yamanote Line, about 20 minutes. Optional late walk through Ameyoko, which is lively at night.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Ameyoko+Ueno+night" target="_blank" rel="noopener">See photos</a></div></div>
+  </div>
+  <div class="note">Ueno Park and Ameyoko moved off this day. Do them on a free morning or evening, or on Nov 4.</div>
+  <div class="daymap" id="map1"></div>
+  <a class="route" data-day="1" target="_blank" rel="noopener">Open Oct 31 route in Google Maps</a>
+</div>
+
+<div class="card" id="day2" style="--c:var(--d2)">
+  <div class="day-head"><div class="badge">Nov 1</div><div><h2>Asakusa &amp; Skytree Sunset</h2><div class="date" style="margin:0">Sun, Nov 1 &middot; temple in the morning, Tokyo Skytree for sunset</div></div></div>
+  <div class="steps">Est. ~15,000 steps (~11 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">~8:30</div><div class="what"><b>Ueno to Asakusa<span class="tag move">travel</span></b><span>Ginza Line, about 5 minutes.</span></div></div>
+    <div class="slot"><div class="time">9:00-11:00</div><div class="what"><b>Senso-ji Temple</b><span>Tokyo's oldest temple. Walk in through the huge red Kaminarimon gate and the Nakamise snack street, then to the main hall and the five-story pagoda. It is busy on a Sunday, so arrive early. The grounds are free.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Senso-ji+Asakusa+Kaminarimon" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~11:00</div><div class="what"><b>Asakusa streets &amp; lunch<span class="tag food">food</span></b><span>Snacks on Nakamise (melon pan, ningyo-yaki), then lunch in the side streets, such as tempura or unagi.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Asakusa+street+food" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~13:30</div><div class="what"><b>Free time<span class="tag opt">optional</span></b><span>Rest at the hotel (5 minutes by train), or walk along the Sumida River and Sumida Park.</span></div></div>
+    <div class="slot"><div class="time">~15:15</div><div class="what"><b>Walk to Tokyo Skytree<span class="tag move">travel</span></b><span>About 20 minutes on foot over the Sumida River. Sunset is around 16:40 in early November.</span></div></div>
+    <div class="slot"><div class="time">~15:45</div><div class="what"><b>Tokyo Skytree, Tembo Deck, sunset<span class="tag book">book</span></b><span>Go up before sunset and stay for the lights. The Tembo Deck is at 350 m, and the Tembo Galleria at 450 m costs extra. Mt Fuji can show on the horizon on a clear day.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Tokyo+Skytree+sunset+view" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~18:00</div><div class="what"><b>Dinner at Solamachi<span class="tag food">food</span></b><span>The shopping and restaurant complex under the tower. After dark the tower is lit up, so look back at it from outside.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Tokyo+Skytree+night+lights" target="_blank" rel="noopener">See photos</a></div></div>
+  </div>
+  <div class="note">Book a timed Skytree ticket for about 15:45 so you are up there before sunset. Check the sunset time on the day. If it is cloudy, you can still go up for the night view.</div>
+  <div class="daymap" id="map2"></div>
+  <a class="route" data-day="2" target="_blank" rel="noopener">Open Nov 1 route in Google Maps</a>
+</div>
+
+<div class="card" id="day3" style="--c:var(--d3)">
+  <div class="day-head"><div class="badge">Nov 2</div><div><h2>Akihabara, Ginza &amp; Roppongi Night</h2><div class="date" style="margin:0">Mon, Nov 2 &middot; electric town, then shopping and a night view</div></div></div>
+  <div class="steps">Est. ~16,000 steps (~11.5 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">~10:45</div><div class="what"><b>Ueno to Akihabara<span class="tag move">travel</span></b><span>About 25 minutes on foot, or one or two stops by train.</span></div></div>
+    <div class="slot"><div class="time">11:00-14:30</div><div class="what"><b>Akihabara</b><span>Anime, manga, retro games, figures and electronics. Try a multi-floor arcade such as GiGO or Taito Station, and a used-games store like Super Potato. Many shops open at 10:00 or 11:00.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Akihabara+electric+town" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~13:00</div><div class="what"><b>Lunch in Akihabara<span class="tag food">food</span></b><span>Curry, ramen or a themed cafe.</span></div></div>
+    <div class="slot"><div class="time">~15:00</div><div class="what"><b>Ginza</b><span>Upscale shopping street. Visit Itoya, the 12-floor stationery store, Uniqlo Ginza, the Kabuki-za theatre exterior and the department stores (Mitsukoshi, Wako). Lively at dusk when the lights come on.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Ginza+Tokyo+night" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~17:30</div><div class="what"><b>Dinner in Ginza or Yurakucho<span class="tag food">food</span></b><span>Under the tracks at Yurakucho there are small yakitori places.</span></div></div>
+    <div class="slot"><div class="time">~19:30</div><div class="what"><b>Roppongi at night<span class="tag book">book</span></b><span>Roppongi Hills and the Mori Tower. For the skyline go up to the Tokyo City View observation deck, which is open late, and the Sky Deck on the roof costs extra. Tokyo Tower shows lit up from the area.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Roppongi+Hills+night+view" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~21:30</div><div class="what"><b>Back to Ueno<span class="tag move">travel</span></b><span>Hibiya Line from Roppongi to Ueno, about 25 minutes.</span></div></div>
+  </div>
+  <div class="note">Check Tokyo City View opening hours and whether the Sky Deck is open that night, since it can close for weather or events.</div>
+  <div class="daymap" id="map3"></div>
+  <a class="route" data-day="3" target="_blank" rel="noopener">Open Nov 2 route in Google Maps</a>
+</div>
+
+<div class="card" id="day4" style="--c:var(--d4)">
+  <div class="day-head"><div class="badge">Nov 3</div><div><h2>Nakameguro, Daikanyama &amp; Odaiba Night</h2><div class="date" style="margin:0">Tue, Nov 3 &middot; stylish districts by day, the waterfront and Rainbow Bridge at night</div></div></div>
+  <div class="steps">Est. ~17,000 steps (~12 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">~10:00</div><div class="what"><b>Ueno to Daikanyama<span class="tag move">travel</span></b><span>Yamanote Line to Ebisu, then a 10-minute walk or the Hibiya and Toyoko lines. About 40 minutes in total.</span></div></div>
+    <div class="slot"><div class="time">10:30-12:00</div><div class="what"><b>Daikanyama</b><span>A relaxed, stylish area with the big Tsutaya Books complex (T-Site), small boutiques and cafes. Many shops open at 11:00. Nov 3 is a national holiday (Culture Day), so expect crowds.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Daikanyama+T-Site+Tokyo" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~12:15</div><div class="what"><b>Nakameguro &amp; lunch<span class="tag food">food</span></b><span>Walk about 15 minutes to the Meguro River canal, with trendy cafes and small shops along it. Lunch here.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Nakameguro+canal+Tokyo" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~14:30</div><div class="what"><b>Shimokitazawa<span class="tag opt">optional</span></b><span>A bohemian neighbourhood of vintage clothes, record shops and small cafes. Optional, and skipping it saves about an hour of travel.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Shimokitazawa+Tokyo" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~16:30</div><div class="what"><b>To Odaiba<span class="tag move">travel</span></b><span>From Shimbashi take the Yurikamome elevated line, a scenic ride across the Rainbow Bridge. Get off at Odaiba Kaihin Koen. Sunset is about 16:45.</span></div></div>
+    <div class="slot"><div class="time">~17:00</div><div class="what"><b>Odaiba Seaside Park, Rainbow Bridge view</b><span>The best view of the Rainbow Bridge and the Tokyo skyline is from the beach promenade by the Statue of Liberty replica. Wait for it to get dark, when the bridge lights up. Check the lighting times.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Odaiba+Rainbow+Bridge+night" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~18:00</div><div class="what"><b>Unicorn Gundam &amp; DiverCity<span class="tag food">food</span></b><span>The life-size Gundam statue in front of DiverCity Tokyo Plaza lights up and moves at set times in the evening. Dinner in the mall.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Odaiba+Gundam+night" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~20:00</div><div class="what"><b>Back to Ueno<span class="tag move">travel</span></b><span>Yurikamome to Shimbashi, then the Ginza Line to Ueno, about 50 minutes.</span></div></div>
+  </div>
+  <div class="note">Waterfall: I could not match a waterfall to Odaiba, whose main night view is the Rainbow Bridge and the skyline. Update this day if you find the spot. Skip Shimokitazawa if you are tired.</div>
+  <div class="daymap" id="map4"></div>
+  <a class="route" data-day="4" target="_blank" rel="noopener">Open Nov 3 route in Google Maps</a>
+</div>
+
+<div class="card" id="day5" style="--c:var(--d5)">
+  <div class="day-head"><div class="badge">Nov 4</div><div><h2>Last Day &amp; Skyliner to Narita</h2><div class="date" style="margin:0">Wed, Nov 4 &middot; check out, light day nearby, then the airport</div></div></div>
+  <div class="steps">Est. ~12,000 steps (~8.5 km)</div>
+  <div class="timeline">
+    <div class="slot"><div class="time">Before 10:00</div><div class="what"><b>Check out and store bags<span class="tag move">travel</span></b><span>Ask the hotel to hold bags at the front desk. If not, use coin lockers at Ueno Station.</span></div></div>
+    <div class="slot"><div class="time">~10:30</div><div class="what"><b>Imperial Palace East Gardens<span class="tag opt">optional</span></b><span>Free gardens on the old Edo Castle grounds, with stone walls, lawns and moats. Closed Mondays and Fridays, and last entry is about 16:00, so Wednesday works. Takes about 1.5 hours. Ueno to Otemachi is about 20 minutes by Chiyoda Line.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Imperial+Palace+East+Gardens+Tokyo" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~13:00</div><div class="what"><b>Lunch near Tokyo Station<span class="tag food">food</span></b><span>Tokyo Station Ramen Street or Kitte, then back to Ueno.</span></div></div>
+    <div class="slot"><div class="time">~14:30</div><div class="what"><b>Yanaka Ginza<span class="tag opt">optional</span></b><span>An old-Tokyo shopping street with cat-themed shops and street snacks. About 20 minutes on foot from Ueno Park. Optional.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Yanaka+Ginza+Tokyo" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~16:00</div><div class="what"><b>Last walk: Ueno Park &amp; Ameyoko</b><span>Final souvenirs and snacks. Ameyoko is good for last-minute gifts.</span><a class="pic" href="https://www.google.com/search?tbm=isch&q=Ameyoko+market" target="_blank" rel="noopener">See photos</a></div></div>
+    <div class="slot"><div class="time">~17:30</div><div class="what"><b>Collect bags, Keisei Skyliner to Narita<span class="tag book">book</span><span class="tag move">travel</span></b><span>From Keisei Ueno, about 41 minutes to Narita Airport Terminal 1. Check which terminal Arkia uses and book the Skyliner. Aim to arrive about 19:15, before the 20:00 check-in.</span></div></div>
+    <div class="slot"><div class="time">~20:00</div><div class="what"><b>Check in for Arkia IZ882</b><span>Departs 23:00. 1 checked bag and 1 trolley each.</span></div></div>
+  </div>
+  <div class="note">Do not stay in the city after about 17:30. Leave a margin for the Skyliner and the airport.</div>
+  <div class="daymap" id="map5"></div>
+  <a class="route" data-day="5" target="_blank" rel="noopener">Open Nov 4 route in Google Maps</a>
+</div>
+
+<div class="card" id="steps">
+  <h2>Steps Overview</h2>
+  <div class="date">Rough estimates at about 1,400 steps per km, including station transfers. Real numbers depend on pace and detours.</div>
+  <table>
+    <tr><th>Day</th><th>Steps</th><th>Distance</th></tr>
+    <tr><td>Sat Oct 31</td><td>~12,000</td><td>~8.5 km</td></tr>
+    <tr><td>Sun Nov 1</td><td>~15,000</td><td>~11 km</td></tr>
+    <tr><td>Mon Nov 2</td><td>~16,000</td><td>~11.5 km</td></tr>
+    <tr><td>Tue Nov 3</td><td>~17,000</td><td>~12 km</td></tr>
+    <tr><td>Wed Nov 4</td><td>~12,000</td><td>~8.5 km</td></tr>
+  </table>
+</div>
+
+<div class="card" id="todo">
+  <h2>Booking Checklist</h2>
+  <ul>
+    <li>Oct 31 Ikebukuro Halloween Cosplay Festival: confirm the 2026 date, times and any entry rules</li>
+    <li>Tokyo Skytree timed ticket for Nov 1, around 15:45 (check the sunset time that day)</li>
+    <li>Roppongi Hills Tokyo City View for Nov 2: check opening hours, and whether the Sky Deck is open</li>
+    <li>Keisei Skyliner for Nov 4, around 17:45 from Keisei Ueno (check which Narita terminal Arkia uses)</li>
+    <li>Odaiba: check the Rainbow Bridge lighting and Gundam show times for Nov 3</li>
+    <li>Imperial Palace East Gardens: closed Mondays and Fridays</li>
+    <li>Ueno hotel is charged Oct 29. Free cancellation ends Oct 31 00:00 Tokyo time</li>
+    <li>Nov 4 bag storage: ask the hotel, or use Ueno Station lockers</li>
+    <li>Verify opening hours on official sites before each day</li>
+  </ul>
+</div>
+
+</main>
+<footer>Harel &amp; Menashe &middot; Japan 2026</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var days = {
+    0: { label: "Hotel", color: "#111827" },
+    1: { label: "Oct 31", color: "#4f9e3f" },
+    2: { label: "Nov 1", color: "#b6007a" },
+    3: { label: "Nov 2", color: "#c1a470" },
+    4: { label: "Nov 3", color: "#00a7db" },
+    5: { label: "Nov 4", color: "#9b7cb6" }
+  };
+  var hotel = ["APA Hotel Keisei Ueno-Ekimae", 35.7106, 139.7753, "Tokyo"];
+  var stops = {
+    1: [
+      ["Ikebukuro Sunshine City", 35.7295, 139.7189, "Tokyo"]
+    ],
+    2: [
+      ["Senso-ji", 35.7148, 139.7967, "Tokyo"],
+      ["Tokyo Skytree", 35.7101, 139.8107, "Tokyo"]
+    ],
+    3: [
+      ["Akihabara", 35.6984, 139.7731, "Tokyo"],
+      ["Ginza", 35.6717, 139.7650, "Tokyo"],
+      ["Roppongi Hills Mori Tower", 35.6604, 139.7292, "Tokyo"]
+    ],
+    4: [
+      ["Daikanyama T-Site", 35.6489, 139.6996, "Tokyo"],
+      ["Nakameguro", 35.6440, 139.6988, "Tokyo"],
+      ["Shimokitazawa (optional)", 35.6613, 139.6683, "Tokyo"],
+      ["Odaiba Seaside Park", 35.6298, 139.7750, "Tokyo"],
+      ["Unicorn Gundam DiverCity", 35.6250, 139.7753, "Tokyo"]
+    ],
+    5: [
+      ["Imperial Palace East Gardens (optional)", 35.6860, 139.7580, "Tokyo"],
+      ["Yanaka Ginza (optional)", 35.7276, 139.7666, "Tokyo"],
+      ["Ameyoko Market", 35.7105, 139.7745, "Tokyo"],
+      ["Keisei Ueno Station", 35.7126, 139.7747, "Tokyo"]
+    ]
+  };
+
+  function gmapsSearch(name, city) {
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " " + city);
+  }
+  function pinIcon(color, text) {
+    return L.divIcon({
+      className: "",
+      html: '<div class="pin" style="--c:' + color + '"><span>' + text + '</span></div>',
+      iconSize: [30, 30], iconAnchor: [15, 34], popupAnchor: [0, -32]
+    });
+  }
+  function popup(name, label, city) {
+    return "<b>" + name + "</b><br>" + label + '<br><a href="' + gmapsSearch(name, city) + '" target="_blank" rel="noopener">Open in Google Maps</a>';
+  }
+
+  Object.keys(stops).forEach(function (d) {
+    var map = L.map("map" + d);
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19, attribution: "Tiles &copy; Esri"
+    }).addTo(map);
+    var pts = [[hotel[1], hotel[2]]];
+    L.marker([hotel[1], hotel[2]], { icon: pinIcon(days[0].color, "H"), zIndexOffset: 1000 })
+      .bindPopup(popup(hotel[0], "Hotel", hotel[3])).addTo(map);
+    stops[d].forEach(function (s, i) {
+      pts.push([s[1], s[2]]);
+      L.marker([s[1], s[2]], { icon: pinIcon(days[d].color, i + 1) })
+        .bindPopup(popup(s[0], days[d].label + " &middot; stop " + (i + 1), s[3])).addTo(map);
+    });
+    L.polyline(pts, { color: days[d].color, weight: 3, opacity: 0.55, dashArray: "6 8" }).addTo(map);
+    map.fitBounds(pts, { padding: [30, 30] });
+  });
+
+  document.querySelectorAll("a.route").forEach(function (a) {
+    var list = stops[a.dataset.day];
+    var names = list.map(function (s) { return s[0].replace(" (optional)", "") + " " + s[3]; });
+    var dest = names[names.length - 1];
+    var way = names.slice(0, -1);
+    a.href = "https://www.google.com/maps/dir/?api=1&travelmode=transit&origin=" +
+      encodeURIComponent(hotel[0] + " " + hotel[3]) + "&destination=" + encodeURIComponent(dest) +
+      (way.length ? "&waypoints=" + encodeURIComponent(way.join("|")) : "");
+  });
+</script>
+</body>
+</html>
