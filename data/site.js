@@ -162,3 +162,30 @@ $$(".chips button").forEach(function (b) {
   else if (todayPanel) showLeg(+todayPanel.id.charAt(1), todayPanel.id);
   else showLeg(0);
 })();
+
+/* Hebrew via Google Translate (cookie googtrans). Button in the tab bar toggles it. */
+(function () {
+  var he = /googtrans=\/en\/iw/.test(document.cookie);
+  var btn = document.getElementById("heBtn");
+  function setCookie(v) {
+    var c = "googtrans=" + v + "; path=/";
+    document.cookie = c;
+    document.cookie = c + "; domain=" + location.hostname;
+  }
+  btn.classList.toggle("on", he);
+  btn.querySelector("span.t").textContent = he ? "English" : "עברית";
+  btn.onclick = function () {
+    if (he) { setCookie("/en/en"); document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"; }
+    else setCookie("/en/iw");
+    location.reload();
+  };
+  if (he) {
+    document.documentElement.dir = "rtl";
+    window.googleTranslateElementInit = function () {
+      new google.translate.TranslateElement({ pageLanguage: "en", includedLanguages: "iw", autoDisplay: false }, "gte");
+    };
+    var s = document.createElement("script");
+    s.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    document.body.appendChild(s);
+  }
+})();

@@ -158,3 +158,14 @@ ul.checks li.done span { opacity:.5; text-decoration:line-through; }
 .tabbar button.on .ic { background:#fff; color:#000; box-shadow:0 0 14px rgba(255,255,255,.5); }
 ul.checks input { accent-color:#4fd1c5; }
 @media (prefers-reduced-motion: reduce) { *, *::before { animation:none !important; } }
+
+/* floating tab bar, lifted off the bottom edge */
+:root { --tab-lift:22px; }
+body { padding-bottom:calc(var(--tab-h) + var(--tab-lift) + env(safe-area-inset-bottom) + 24px); }
+.tabbar { left:10px; right:10px; bottom:calc(var(--tab-lift) + env(safe-area-inset-bottom)); height:var(--tab-h); padding-bottom:0; border:1px solid var(--line); border-radius:22px; box-shadow:0 8px 28px rgba(0,0,0,.45); }
+.tabbar button.he { font-size:.9rem; }
+/* Google Translate (Hebrew): hide its banner/widget */
+.skiptranslate iframe, .goog-te-banner-frame { display:none !important; }
+body { top:0 !important; }
+#gte { display:none; }
+html[dir=rtl] .chips, html[dir=rtl] .tabbar { direction:rtl; }

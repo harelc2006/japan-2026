@@ -163,6 +163,17 @@ ul.checks li.done span { opacity:.5; text-decoration:line-through; }
 .tabbar button.on .ic { background:#fff; color:#000; box-shadow:0 0 14px rgba(255,255,255,.5); }
 ul.checks input { accent-color:#4fd1c5; }
 @media (prefers-reduced-motion: reduce) { *, *::before { animation:none !important; } }
+
+/* floating tab bar, lifted off the bottom edge */
+:root { --tab-lift:22px; }
+body { padding-bottom:calc(var(--tab-h) + var(--tab-lift) + env(safe-area-inset-bottom) + 24px); }
+.tabbar { left:10px; right:10px; bottom:calc(var(--tab-lift) + env(safe-area-inset-bottom)); height:var(--tab-h); padding-bottom:0; border:1px solid var(--line); border-radius:22px; box-shadow:0 8px 28px rgba(0,0,0,.45); }
+.tabbar button.he { font-size:.9rem; }
+/* Google Translate (Hebrew): hide its banner/widget */
+.skiptranslate iframe, .goog-te-banner-frame { display:none !important; }
+body { top:0 !important; }
+#gte { display:none; }
+html[dir=rtl] .chips, html[dir=rtl] .tabbar { direction:rtl; }
 </style></head><body>
 <section class="leg" id="leg0">
 <header class="plate"><div class="kanji">日本</div><div class="pl-main"><h1>Japan 2026</h1><p>Harel &amp; Menashe &middot; Oct 21 &ndash; Nov 5</p></div></header>
@@ -517,6 +528,8 @@ ul.checks input { accent-color:#4fd1c5; }
 <button data-leg="1"><span class="ic">新</span>Tokyo</button>
 <button data-leg="2"><span class="ic">阪</span>Osaka</button>
 <button data-leg="3"><span class="ic">野</span>Ueno</button>
+<button id="heBtn" class="he"><span class="ic">א</span><span class="t">עברית</span></button>
+<div id="gte"></div>
 </nav>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -810,5 +823,32 @@ $$(".chips button").forEach(function (b) {
   else if (/^leg[1-3]$/.test(h)) showLeg(+h.charAt(3));
   else if (todayPanel) showLeg(+todayPanel.id.charAt(1), todayPanel.id);
   else showLeg(0);
+})();
+
+/* Hebrew via Google Translate (cookie googtrans). Button in the tab bar toggles it. */
+(function () {
+  var he = /googtrans=\/en\/iw/.test(document.cookie);
+  var btn = document.getElementById("heBtn");
+  function setCookie(v) {
+    var c = "googtrans=" + v + "; path=/";
+    document.cookie = c;
+    document.cookie = c + "; domain=" + location.hostname;
+  }
+  btn.classList.toggle("on", he);
+  btn.querySelector("span.t").textContent = he ? "English" : "עברית";
+  btn.onclick = function () {
+    if (he) { setCookie("/en/en"); document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"; }
+    else setCookie("/en/iw");
+    location.reload();
+  };
+  if (he) {
+    document.documentElement.dir = "rtl";
+    window.googleTranslateElementInit = function () {
+      new google.translate.TranslateElement({ pageLanguage: "en", includedLanguages: "iw", autoDisplay: false }, "gte");
+    };
+    var s = document.createElement("script");
+    s.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    document.body.appendChild(s);
+  }
 })();
 </script></body></html>

@@ -95,6 +95,8 @@ html = '''<!DOCTYPE html>
 <button data-leg="1"><span class="ic">新</span>Tokyo</button>
 <button data-leg="2"><span class="ic">阪</span>Osaka</button>
 <button data-leg="3"><span class="ic">野</span>Ueno</button>
+<button id="heBtn" class="he"><span class="ic">א</span><span class="t">עברית</span></button>
+<div id="gte"></div>
 </nav>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
