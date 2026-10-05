@@ -179,6 +179,9 @@ html[dir=rtl] .chips, html[dir=rtl] .tabbar { direction:rtl; }
 body { padding-top:calc(var(--tab-h) + env(safe-area-inset-top) + 10px); padding-bottom:24px; }
 .tabbar { bottom:auto; top:calc(env(safe-area-inset-top) + 6px); box-shadow:0 6px 20px rgba(0,0,0,.4); }
 .chips { top:calc(var(--tab-h) + env(safe-area-inset-top) + 12px); margin-top:0; }
+
+.pinlabel { background:rgba(255,255,255,.92); color:#17233a; border:1px solid rgba(0,0,0,.25); border-radius:6px; font:700 11px var(--font); padding:1px 6px; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+.pinlabel:before { display:none; }
 </style></head><body>
 <section class="leg" id="leg0">
 <header class="plate"><div class="kanji">日本</div><div class="pl-main"><h1>Japan 2026</h1><p>Harel &amp; Menashe &middot; Oct 21 &ndash; Nov 5</p></div></header>
@@ -1096,7 +1099,7 @@ function buildMap(n, d) {
   list.forEach(function (s, i) {
     pts.push([s[1], s[2]]);
     L.marker([s[1], s[2]], { icon: pinIcon(color, i + 1) })
-      .bindPopup("<b>" + s[0] + "</b><br>Stop " + (i + 1) + "<br><a href='" + gm(s[0], city(s)) + "' target='_blank' rel='noopener'>Open in Google Maps</a>").addTo(map);
+      .bindPopup("<b>" + s[0] + "</b><br>Stop " + (i + 1) + "<br><a href='" + gm(s[0], city(s)) + "' target='_blank' rel='noopener'>Open in Google Maps</a>").bindTooltip((i + 1) + " · " + s[0], { permanent: true, direction: "right", offset: [14, -16], className: "pinlabel" }).addTo(map);
   });
   L.polyline(pts, { color: color, weight: 4, opacity: 0.6, dashArray: "6 8" }).addTo(map);
   map.fitBounds(pts, { padding: [30, 30] });
