@@ -39,10 +39,22 @@ P = [
  ("DW3zMg6iLwe","Toyosu tuna auction tour",35.6450,139.7840,"sight",None,"World's biggest fish market. Arrive just before 5:00, taxi only (no public transport then). Tour via Airbnb/Klook."),
  ("DY4vzXzohQk","The Giant 3D Cat (Shinjuku)",35.6910,139.7020,"sight",None,"3D cat billboard at Shinjuku Stn east. Same reel: Godzilla Head, Kabukicho, Omoide Yokocho."),
  ("DY4vzXzohQk","Godzilla Head",35.6954,139.7004,"sight",None,"Godzilla on the Hotel Gracery, Kabukicho. Near the Shinjuku hotel."),
+
+ (None,"Uobei Shibuya Dogenzaka",35.6590,139.6985,"food",None,"Conveyor-belt sushi ordered on a touchscreen, fast belt, very cheap. From the Hoang Pham guide. Walk-in."),
+ (None,"Ichiran Ramen (Shibuya)",35.6598,139.7005,"food",None,"Solo-booth tonkotsu ramen, tick your own order sheet. From the guide. Open late."),
+ (None,"The French Toast Factory Akihabara",35.6985,139.7730,"food",None,"Thick French toast brunch near Akihabara. From the guide. Go at opening."),
+ (None,"Butaichi Hokkaido Banya Ikebukuro",35.7295,139.7110,"food",None,"Hokkaido butadon pork bowls, Ikebukuro. From the guide."),
+ (None,"Gyukatsu Kyoto Katsugyu (Shijo Kawaramachi)",35.0035,135.7690,"food",2,"Beef cutlet cooked on your own hot stone. From the guide. Queue at dinner."),
+ (None,"Menbaka Fire Ramen",35.0140,135.7480,"food",2,"Ramen served with a flaming oil show, Kyoto. From the guide. Book a slot."),
+ (None,"551 Horai Honten (Namba)",34.6660,135.5018,"food",2,"Famous Osaka pork buns, takeaway. From the guide. Also at Kyoto Station."),
+ (None,"Matsusaka M Sennichimae",34.6660,135.5040,"food",2,"Matsusaka wagyu yakiniku, Namba. From the guide."),
+ (None,"Udon Tamatama (Namba)",34.6655,135.5030,"food",2,"Udon shop near Namba. From the guide."),
+ (None,"Rikuro's Namba Cheesecake",34.6665,135.5010,"food",2,"Jiggly warm Japanese cheesecake, Namba. From the guide."),
 ]
 out = []
 for i, n, la, ln, t, leg, note in P:
     d = {"name": n, "lat": la, "lng": ln, "type": t, "note": note, "reel": "https://www.instagram.com/reel/%s/" % i}
+    if not i: del d["reel"]
     if leg: d["leg"] = leg
     out.append(d)
 hdr = open('data/places.js', encoding='utf-8').read().split('var PLACES')[0]

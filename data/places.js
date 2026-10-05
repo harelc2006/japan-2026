@@ -297,5 +297,81 @@ var PLACES = [
   "type": "sight",
   "note": "Godzilla on the Hotel Gracery, Kabukicho. Near the Shinjuku hotel.",
   "reel": "https://www.instagram.com/reel/DY4vzXzohQk/"
+ },
+ {
+  "name": "Uobei Shibuya Dogenzaka",
+  "lat": 35.659,
+  "lng": 139.6985,
+  "type": "food",
+  "note": "Conveyor-belt sushi ordered on a touchscreen, fast belt, very cheap. From the Hoang Pham guide. Walk-in."
+ },
+ {
+  "name": "Ichiran Ramen (Shibuya)",
+  "lat": 35.6598,
+  "lng": 139.7005,
+  "type": "food",
+  "note": "Solo-booth tonkotsu ramen, tick your own order sheet. From the guide. Open late."
+ },
+ {
+  "name": "The French Toast Factory Akihabara",
+  "lat": 35.6985,
+  "lng": 139.773,
+  "type": "food",
+  "note": "Thick French toast brunch near Akihabara. From the guide. Go at opening."
+ },
+ {
+  "name": "Butaichi Hokkaido Banya Ikebukuro",
+  "lat": 35.7295,
+  "lng": 139.711,
+  "type": "food",
+  "note": "Hokkaido butadon pork bowls, Ikebukuro. From the guide."
+ },
+ {
+  "name": "Gyukatsu Kyoto Katsugyu (Shijo Kawaramachi)",
+  "lat": 35.0035,
+  "lng": 135.769,
+  "type": "food",
+  "note": "Beef cutlet cooked on your own hot stone. From the guide. Queue at dinner.",
+  "leg": 2
+ },
+ {
+  "name": "Menbaka Fire Ramen",
+  "lat": 35.014,
+  "lng": 135.748,
+  "type": "food",
+  "note": "Ramen served with a flaming oil show, Kyoto. From the guide. Book a slot.",
+  "leg": 2
+ },
+ {
+  "name": "551 Horai Honten (Namba)",
+  "lat": 34.666,
+  "lng": 135.5018,
+  "type": "food",
+  "note": "Famous Osaka pork buns, takeaway. From the guide. Also at Kyoto Station.",
+  "leg": 2
+ },
+ {
+  "name": "Matsusaka M Sennichimae",
+  "lat": 34.666,
+  "lng": 135.504,
+  "type": "food",
+  "note": "Matsusaka wagyu yakiniku, Namba. From the guide.",
+  "leg": 2
+ },
+ {
+  "name": "Udon Tamatama (Namba)",
+  "lat": 34.6655,
+  "lng": 135.503,
+  "type": "food",
+  "note": "Udon shop near Namba. From the guide.",
+  "leg": 2
+ },
+ {
+  "name": "Rikuro's Namba Cheesecake",
+  "lat": 34.6665,
+  "lng": 135.501,
+  "type": "food",
+  "note": "Jiggly warm Japanese cheesecake, Namba. From the guide.",
+  "leg": 2
  }
 ];
