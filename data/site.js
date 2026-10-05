@@ -50,11 +50,11 @@ function buildMap(n, d) {
     var shown = 0;
     (window.PLACES || []).forEach(function (p) {
       if (p.leg && p.leg !== n) return;
-      var near = centers.some(function (c, i) { return km(c, [p.lat, p.lng]) <= (i >= pts.length ? 1 : 1.2); });
+      var near = centers.some(function (c, i) { return km(c, [p.lat, p.lng]) <= (i >= pts.length ? 1.5 : 2.5); });
       if (!near) return;
       shown++;
       L.marker([p.lat, p.lng], { icon: L.divIcon({ className: "", html: '<div class="pl">' + (ICONS[p.type] || "📍") + "</div>", iconSize: [26, 26], iconAnchor: [13, 13] }) })
-        .bindPopup("<b>" + p.name + "</b>" + (p.note ? "<br>" + p.note : "") + "<br><a href='" + (p.url || gm(p.name, city(hotel))) + "' target='_blank' rel='noopener'>Open in Google Maps</a>").addTo(layer);
+        .bindPopup("<b>" + p.name + "</b>" + (p.note ? "<br>" + p.note : "") + (p.reel ? "<br><a href='" + p.reel + "' target='_blank' rel='noopener'>▶ Watch the reel</a>" : "") + "<br><a href='" + (p.url || gm(p.name, city(hotel))) + "' target='_blank' rel='noopener'>Open in Google Maps</a>").addTo(layer);
     });
     if (shown && !box) {
       box = document.createElement("label");
