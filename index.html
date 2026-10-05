@@ -1102,10 +1102,10 @@ $$(".panel").forEach(function (p) {
     if (store.get(k)) s.classList.add("done");
     b.onclick = function () { s.classList.toggle("done"); store.set(k, s.classList.contains("done")); };
   });
-  var ul = p.id.slice(-4) === "todo" ? $("ul", p) : null;
-  if (ul) {
-    ul.className = "checks";
-    $$("li", ul).forEach(function (li, i) {
+  var uls = p.id.slice(-4) === "todo" ? $$("ul", p) : [];
+  if (uls.length) {
+    uls.forEach(function (u) { u.className = "checks"; });
+    $$("li", p).forEach(function (li, i) {
       var k = p.id + "-c" + i, box = document.createElement("input");
       box.type = "checkbox"; box.checked = !!store.get(k);
       li.innerHTML = "<span>" + li.innerHTML + "</span>"; li.insertBefore(box, li.firstChild);
