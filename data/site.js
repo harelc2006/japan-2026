@@ -32,7 +32,7 @@ function buildMap(n, d) {
   list.forEach(function (s, i) {
     pts.push([s[1], s[2]]);
     L.marker([s[1], s[2]], { icon: pinIcon(color, i + 1) })
-      .bindPopup("<b>" + s[0] + "</b><br>Stop " + (i + 1) + "<br><a href='" + gm(s[0], city(s)) + "' target='_blank' rel='noopener'>Open in Google Maps</a>").bindTooltip((i + 1) + " · " + s[0], { permanent: true, direction: "right", offset: [14, -16], className: "pinlabel" }).addTo(map);
+      .bindPopup("<b>" + s[0] + "</b><br>Stop " + (i + 1) + "<br><a href='" + gm(s[0], city(s)) + "' target='_blank' rel='noopener'>Open in Google Maps</a>").addTo(map);
   });
   L.polyline(pts, { color: color, weight: 4, opacity: 0.6, dashArray: "6 8" }).addTo(map);
   map.fitBounds(pts, { padding: [30, 30] });
