@@ -181,6 +181,32 @@ body { padding-top:calc(var(--tab-h) + env(safe-area-inset-top) + 10px); padding
 
 .pn { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 5px; margin-right:7px; border-radius:10px; background:var(--c); color:#fff; font:700 12px var(--font); vertical-align:1px; box-sizing:border-box; }
 .todo-h { margin:18px 0 6px; font:700 13px var(--font); letter-spacing:.04em; text-transform:uppercase; opacity:.7; }
+
+/* ---- Slate dark palette + glassmorphism (overrides the black theme above) ---- */
+:root { --bg:#0f172a; --surface:#1e293b; --ink:#f1f5f9; --muted:#94a3b8; --line:rgba(51,65,85,.5); --soft:rgba(51,65,85,.55); }
+body { background:radial-gradient(1200px 600px at 10% -10%,#1e293b 0%,transparent 60%),radial-gradient(900px 500px at 100% 0%,#1e1b4b55 0%,transparent 55%),#0f172a; background-attachment:fixed; }
+.plate { background:linear-gradient(135deg,rgba(30,41,59,.8),rgba(15,23,42,.7)); border-color:rgba(51,65,85,.5); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+.card { background:rgba(30,41,59,.8); border:1px solid rgba(51,65,85,.5); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); box-shadow:0 8px 24px -12px rgba(0,0,0,.5); }
+.chips { background:rgba(15,23,42,.75); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+.chips button { background:rgba(30,41,59,.7); border-color:rgba(51,65,85,.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.chips button.txt.on { background:#f1f5f9; color:#0f172a; border-color:#f1f5f9; box-shadow:0 0 14px rgba(241,245,249,.25); }
+.tabbar { background:rgba(30,41,59,.7); border-color:rgba(51,65,85,.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+.tabbar button.on .ic { background:#f1f5f9; color:#0f172a; box-shadow:0 0 14px rgba(241,245,249,.35); }
+.slot::before { background:#0f172a; }
+.route-list li::before { background:#0f172a; }
+.maptools button, .maptools label { background:rgba(51,65,85,.45); border-color:rgba(71,85,105,.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.daymap { border-color:rgba(51,65,85,.6); }
+
+/* softer gradient badges */
+.badge { background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#6366f1)); box-shadow:0 0 16px -2px var(--c); }
+.pn { background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 60%,#6366f1)); }
+.route, .today-card button { background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 60%,#6366f1)); }
+.tag { background:rgba(51,65,85,.55); border-color:rgba(71,85,105,.6); color:#cbd5e1; }
+.tag.book { background:linear-gradient(135deg,#f43f5e,#e11d48); border-color:rgba(251,113,133,.5); color:#fff; box-shadow:0 0 10px rgba(244,63,94,.35); }
+.tag.food { background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(251,191,36,.12)); border-color:rgba(245,158,11,.4); color:#fde68a; }
+.tag.opt { background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(52,211,153,.12)); border-color:rgba(16,185,129,.4); color:#a7f3d0; }
+.note { background:rgba(245,158,11,.1); color:#fde68a; border-left-color:#f59e0b; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.steps { background:rgba(51,65,85,.55); }
 </style></head><body>
 <section class="leg" id="leg0">
 <header class="plate"><div class="kanji">日本</div><div class="pl-main"><h1>Japan 2026</h1><p>Harel &amp; Menashe &middot; Oct 21 &ndash; Nov 5</p></div></header>
