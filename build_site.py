@@ -71,8 +71,9 @@ def number_slots(n, d, body, names):
 # To-book items: only things that need or strongly benefit from a reservation/ticket (matched by text).
 BOOK = re.compile(r'Shibuya Sky|teamLab|Narita Express|Shinkansen|Kaiyukan|Water Bus|Sagano|Dotonbori night cruise|'
                   r'Kitan Hibiki|Hikiniku to Come|Gansan Sanjo|Marutomi|Kichikichi|Kokuryu|Yoshitake|IDATEN|Menbaka|'
-                  r'Skytree|Skyliner|Coco Nemaru|FORNO')
-BOOK_CATS = [('Transport', r'Narita Express|Shinkansen|Skyliner'),
+                  r'Skytree|Skyliner|Coco Nemaru|FORNO|eSIMs')
+BOOK_CATS = [('Before you fly', r'eSIMs'),
+             ('Transport', r'Narita Express|Shinkansen|Skyliner'),
              ('Attractions and tickets', r'Shibuya Sky|teamLab|Kaiyukan|Water Bus|Sagano|cruise|Skytree'),
              ('Restaurants', r'.')]
 
