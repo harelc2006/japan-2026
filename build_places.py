@@ -36,7 +36,6 @@ P = [
  ("DXvvIT4yO8E","Yoshitake wagyu sukiyaki lunch",34.6810,135.5200,"food",2,"Second reel: lunch sukiyaki at the same restaurant."),
  ("DXjc796EfQI","Yakiniku Rikimaru (Ohatsutenjin)",34.7035,135.5000,"food",2,"All-you-can-eat wagyu yakiniku 90 min ¥5,478. Short walk from Umeda. Until 23:30."),
  ("DT2c7XPDbji","Coco Nemaru Ginza",35.6720,139.7650,"food",None,"Ginza wagyu in 450 g to ~1 kg cuts grilled in front of you, shareable."),
- ("DW3zMg6iLwe","Toyosu tuna auction tour",35.6450,139.7840,"sight",None,"World's biggest fish market. Arrive just before 5:00, taxi only (no public transport then). Tour via Airbnb/Klook."),
  ("DY4vzXzohQk","The Giant 3D Cat (Shinjuku)",35.6910,139.7020,"sight",None,"3D cat billboard at Shinjuku Stn east. Same reel: Godzilla Head, Kabukicho, Omoide Yokocho."),
  ("DY4vzXzohQk","Godzilla Head",35.6954,139.7004,"sight",None,"Godzilla on the Hotel Gracery, Kabukicho. Near the Shinjuku hotel."),
 

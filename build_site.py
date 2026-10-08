@@ -13,6 +13,90 @@ LINE = {1022: '#e0800a', 1023: '#d4001a', 1024: '#0095c8', 1025: '#00946a', 1026
         1101: '#b6007a', 1102: '#c1a470', 1103: '#00a7db', 1104: '#9b7cb6'}
 LABEL = {'info': 'Info', 'steps': 'Steps', 'todo': 'To book'}
 
+STOPW = set('the a of and in at to optional temple shrine park street market garden gardens museum station'.split())
+# Manual pin -> slot-title overrides where fuzzy matching is wrong: (leg, day, pin) -> text in slot title
+PIN_SLOT = {(3, 5, 4): 'Collect bags', (1, 2, 5): 'Cat Street', (2, 3, 1): 'Osaka Water Bus'}
+
+
+def _toks(t):
+    t = re.sub(r'<[^>]+>', ' ', t).replace('&amp;', '&').lower()
+    return set(w for w in re.findall(r'[a-z0-9]+', t) if w not in STOPW)
+
+
+def number_slots(n, d, body, names):
+    """Prefix each timeline slot with the number of the map pin(s) it matches."""
+    slots = list(re.finditer(r'<div class="slot">.*?</div></div>', body, re.S))
+    info = []
+    for m in slots:
+        b = re.search(r'<b>(.*?)</b>', m.group(0), re.S)
+        title = b.group(1) if b else ''
+        info.append((m, title, _toks(title), _toks(m.group(0)), 'class="tag move"' in m.group(0)))
+    assign = {}
+    for i, name in enumerate(names):
+        pt = _toks(re.sub(r'\(.*?\)', '', name))
+        if not pt:
+            continue
+        ov = PIN_SLOT.get((n, d, i + 1))
+        best = None
+        if ov:
+            best = next((k for k, x in enumerate(info) if ov in x[1]), None)
+        else:
+            for tier in (2, 3):
+                cand = []
+                for k, x in enumerate(info):
+                    sc = len(pt & (x[2] if tier == 2 else x[3])) / len(pt)
+                    if sc >= (0.5 if tier == 2 else 0.7):
+                        cand.append((-sc, x[4], k))
+                if cand:
+                    best = sorted(cand)[0][2]
+                    break
+        if best is not None:
+            assign.setdefault(best, []).append(i + 1)
+        else:
+            print('  no slot for pin', n, d, i + 1, name)
+    out, last = [], 0
+    for k, (m, *_r) in enumerate(info):
+        out.append(body[last:m.start()])
+        txt = m.group(0)
+        if k in assign:
+            nums = assign[k]
+            lab = str(nums[0]) if len(nums) == 1 else '%d-%d' % (nums[0], nums[-1]) if nums == list(range(nums[0], nums[-1] + 1)) else ','.join(map(str, nums))
+            txt = txt.replace('<b>', '<b><span class="pn">%s</span>' % lab, 1)
+        out.append(txt)
+        last = m.end()
+    out.append(body[last:])
+    return ''.join(out)
+
+
+# To-book items: only things that need or strongly benefit from a reservation/ticket (matched by text).
+BOOK = re.compile(r'Shibuya Sky|teamLab|Narita Express|Shinkansen|Kaiyukan|Water Bus|Sagano|Dotonbori night cruise|'
+                  r'Kitan Hibiki|Hikiniku to Come|Gansan Sanjo|Marutomi|Kichikichi|Kokuryu|Yoshitake|IDATEN|Menbaka|'
+                  r'Skytree|Skyliner|Coco Nemaru|FORNO')
+BOOK_CATS = [('Transport', r'Narita Express|Shinkansen|Skyliner'),
+             ('Attractions and tickets', r'Shibuya Sky|teamLab|Kaiyukan|Water Bus|Sagano|cruise|Skytree'),
+             ('Restaurants', r'.')]
+
+
+def group_todo(body):
+    """Split the checklist: booking items (grouped) stay; the rest go to a 'Walk-in and tips' list."""
+    lis = re.findall(r'<li>(.*?)</li>', body, re.S)
+    groups = {c[0]: [] for c in BOOK_CATS}
+    other = []
+    for li in lis:
+        txt = re.sub(r'<[^>]+>', '', li).split(':')[0]
+        if not BOOK.search(txt):
+            other.append(li)
+            continue
+        for title, pat in BOOK_CATS:
+            if re.search(pat, txt):
+                groups[title].append(li)
+                break
+    h2 = '<h2>To book</h2>'
+    main = h2 + ''.join('<h3 class="todo-h">%s</h3><ul>%s</ul>' % (t, ''.join('<li>%s</li>' % x for x in groups[t]))
+                        for t, _ in BOOK_CATS if groups[t])
+    rest = '<h2>Walk-in and tips</h2><ul class="plain">%s</ul>' % ''.join('<li>%s</li>' % x for x in other)
+    return main, rest
+
 
 def conv(n, path):
     s = open(path, encoding='utf-8').read()
@@ -37,10 +121,18 @@ def conv(n, path):
             d = int(m.group(3))
             k = (10 if m.group(2) == 'Oct' else 11) * 100 + d
             daydates[int(cid[3:])] = k
+            dn = int(cid[3:])
+            sb = re.search(r'(?<![\w])%d: \[(.*?)\n    \]' % dn, stops, re.S)
+            if sb:
+                body = number_slots(n, dn, body, re.findall(r'\["([^"]+)"', sb.group(1)))
             body = re.sub(r'<div class="badge">.*?</div>', '<div class="badge">%d</div>' % d, body, count=1)
             attrs = ' data-date="2026-%02d-%02d" style="--c:%s"' % (k // 100, d, LINE[k])
             dayc.append('<button data-p="%s" style="--c:%s"><b>%d</b><i>%s</i></button>' % (pid, LINE[k], d, m.group(1)))
         else:
+            if cid == 'todo':
+                body, walk = group_todo(body)
+                panels.append('<article class="panel" id="l%d-walkin"><div class="card">%s</div></article>' % (n, walk))
+                rest.append('<button class="txt" data-p="l%d-walkin">Walk-in</button>' % n)
             (info if cid == 'info' else rest).append('<button class="txt" data-p="%s">%s</button>' % (pid, LABEL.get(cid, cid)))
         panels.append('<article class="panel" id="%s"%s><div class="card">%s</div></article>' % (pid, attrs, body))
     prev, nxt = NEIGH[n]
@@ -86,8 +178,8 @@ PLACES = open('data/places.js', encoding='utf-8').read()
 html = '''<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000"><title>Japan 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="data/vendor/leaflet.css">
 <style>''' + CSS + '''</style></head><body>
 ''' + OVERVIEW + '\n' + '\n'.join(secs) + '''
 <nav class="tabbar" id="tabbar">
@@ -98,7 +190,7 @@ html = '''<!DOCTYPE html>
 <button id="heBtn" class="he"><span class="ic">א</span><span class="t">עברית</span></button>
 <div id="gte"></div>
 </nav>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/vendor/leaflet.js"></script>
 <script>
 ''' + PLACES + '\nvar LEGS = {};\n' + '\n'.join(datas) + '\n' + JS + '</script></body></html>'
 open('index.html', 'w', encoding='utf-8').write(html)

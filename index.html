@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000"><title>Japan 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="data/vendor/leaflet.css">
 <style>:root {
   --bg:#000; --surface:#0d1017; --ink:#f2f4f8; --muted:#8f9bb0; --line:#1e2532; --soft:#161b26;
   --tab-h:64px; --font:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -501,7 +501,7 @@ body { padding-top:calc(var(--tab-h) + env(safe-area-inset-top) + 10px); padding
 <button id="heBtn" class="he"><span class="ic">א</span><span class="t">עברית</span></button>
 <div id="gte"></div>
 </nav>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/vendor/leaflet.js"></script>
 <script>
 // Saved restaurants, shops and sights. They appear on a day's map (toggle under the map)
 // when they are within ~1.2 km of that day's route, or within 1 km of your location after you tap "My location".
