@@ -187,6 +187,7 @@ $$(".chips button").forEach(function (b) {
   }
   btn.classList.toggle("on", he);
   btn.querySelector("span.t").textContent = he ? "English" : "עברית";
+  btn.querySelector("span.ic").textContent = he ? "EN" : "א";
   btn.onclick = function () {
     if (he) { setCookie("/en/en"); document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"; }
     else setCookie("/en/iw");
@@ -226,3 +227,16 @@ if ("serviceWorker" in navigator) {
   });
   window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
 }
+
+/* tidy times: fixed-width clock column, "~" and ranges moved to small side text */
+$$(".time").forEach(function (t) {
+  var s = t.textContent.trim(), m;
+  function pad(x) { return x.length < 5 ? "0" + x : x; }
+  if ((m = s.match(/^(~?)(\d{1,2}:\d{2})(?:-(\d{1,2}:\d{2}))?$/))) {
+    t.innerHTML = '<span class="tm' + (m[1] ? ' ap' : '') + '">' + pad(m[2]) + '</span>' + (m[3] ? '<span class="ts">to ' + pad(m[3]) + '</span>' : '');
+  } else if ((m = s.match(/^Before (\d{1,2}:\d{2})$/))) {
+    t.innerHTML = '<span class="tm">' + pad(m[1]) + '</span><span class="ts">before</span>';
+  } else {
+    t.innerHTML = '<span class="tw">' + s + '</span>';
+  }
+});

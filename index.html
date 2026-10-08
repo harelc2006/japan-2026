@@ -207,6 +207,47 @@ body { background:radial-gradient(1200px 600px at 10% -10%,#1e293b 0%,transparen
 .tag.opt { background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(52,211,153,.12)); border-color:rgba(16,185,129,.4); color:#a7f3d0; }
 .note { background:rgba(245,158,11,.1); color:#fde68a; border-left-color:#f59e0b; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
 .steps { background:rgba(51,65,85,.55); }
+
+/* ---- Neon Tokyo night (overrides slate above) ---- */
+:root { --bg:#07060f; --surface:#120f26; --ink:#f4f2ff; --muted:#9a93c4; --line:rgba(139,92,246,.28); --soft:rgba(139,92,246,.16); --neon-a:#22e5ff; --neon-b:#ff2bd6; --neon-c:#b6ff3b; }
+body { background:radial-gradient(900px 500px at 8% -8%,rgba(255,43,214,.20),transparent 60%),radial-gradient(900px 560px at 100% 0%,rgba(34,229,255,.16),transparent 55%),linear-gradient(rgba(139,92,246,.05) 1px,transparent 1px) 0 0/100% 36px,linear-gradient(90deg,rgba(139,92,246,.05) 1px,transparent 1px) 0 0/36px 100%,#07060f; background-attachment:fixed; }
+.plate { background:linear-gradient(135deg,rgba(24,16,48,.85),rgba(10,8,24,.8)); border:1px solid rgba(34,229,255,.35); box-shadow:0 0 0 1px rgba(255,43,214,.15),0 0 28px -6px rgba(34,229,255,.45),inset 0 0 30px -18px var(--neon-a); }
+.plate h1,.plate .kanji { color:#fff; text-shadow:0 0 6px rgba(34,229,255,.9),0 0 22px rgba(255,43,214,.6); }
+.card { background:rgba(18,15,38,.78); border:1px solid rgba(139,92,246,.3); box-shadow:0 0 22px -10px var(--c),inset 0 1px 0 rgba(255,255,255,.05); }
+.chips { background:rgba(7,6,15,.8); }
+.chips button { background:rgba(18,15,38,.8); border-color:rgba(139,92,246,.35); color:#d9d4ff; transition:box-shadow .2s,border-color .2s; }
+.chips button:hover { border-color:var(--neon-a); box-shadow:0 0 12px -2px var(--neon-a); }
+.chips button.txt.on, .chips button.on { background:linear-gradient(135deg,#22e5ff,#8b5cf6 60%,#ff2bd6); color:#07060f; border-color:transparent; box-shadow:0 0 18px rgba(34,229,255,.55),0 0 34px rgba(255,43,214,.3); }
+.tabbar { background:rgba(10,8,24,.8); border-color:rgba(34,229,255,.35); box-shadow:0 0 24px -8px var(--neon-a); }
+.tabbar button.on { color:#fff; }
+.tabbar button.on .ic { background:linear-gradient(135deg,#22e5ff,#ff2bd6); color:#07060f; box-shadow:0 0 16px rgba(34,229,255,.7),0 0 30px rgba(255,43,214,.4); }
+.slot::before { background:#07060f; border-color:var(--c); box-shadow:0 0 10px var(--c),0 0 20px -2px var(--c); }
+.route-list li::before { background:#07060f; box-shadow:0 0 8px var(--c); }
+.badge { background:linear-gradient(135deg,var(--c),#8b5cf6 80%); box-shadow:0 0 18px var(--c),0 0 36px -6px var(--c); color:#07060f; }
+.pn { background:transparent; border:1px solid var(--c); color:var(--c); box-shadow:0 0 8px -1px var(--c); }
+.route, .today-card button { background:linear-gradient(135deg,#22e5ff,#8b5cf6 65%,#ff2bd6); color:#07060f; box-shadow:0 0 16px -2px rgba(34,229,255,.7); }
+.tag { background:rgba(139,92,246,.15); border-color:rgba(139,92,246,.4); color:#d9d4ff; }
+.tag.book { background:linear-gradient(135deg,#ff2bd6,#ff3d6e); border-color:transparent; color:#fff; box-shadow:0 0 14px rgba(255,43,214,.65); }
+.tag.food { background:rgba(255,184,0,.12); border-color:rgba(255,184,0,.55); color:#ffe08a; box-shadow:0 0 10px -3px #ffb800; }
+.tag.opt { background:rgba(182,255,59,.1); border-color:rgba(182,255,59,.5); color:#d9ff9a; box-shadow:0 0 10px -3px var(--neon-c); }
+.note { background:rgba(255,184,0,.08); color:#ffe08a; border-left-color:#ffb800; box-shadow:-6px 0 18px -10px #ffb800; }
+.steps { background:rgba(139,92,246,.16); }
+.maptools button, .maptools label { background:rgba(18,15,38,.7); border-color:rgba(34,229,255,.4); color:#d9f9ff; }
+.daymap { border-color:rgba(34,229,255,.4); box-shadow:0 0 20px -8px var(--neon-a); }
+@media (prefers-reduced-motion:no-preference){ .badge{ animation:neonpulse 3.2s ease-in-out infinite; } }
+@keyframes neonpulse { 50% { box-shadow:0 0 26px var(--c),0 0 50px -4px var(--c); } }
+
+/* ---- tidy time column, aligned tab bar, corner language toggle, neon map ---- */
+.time { flex:0 0 66px; text-align:right; padding-right:0; font-variant-numeric:tabular-nums; display:flex; flex-direction:column; align-items:flex-end; justify-content:flex-start; }
+.time .tm { font-weight:900; font-size:.95rem; letter-spacing:.01em; position:relative; color:#fff; text-shadow:0 0 8px color-mix(in srgb,var(--c) 70%,transparent); }
+.time .tm.ap::before { content:"~"; position:absolute; right:100%; margin-right:2px; opacity:.5; font-weight:400; }
+.time .ts { font-size:.68rem; font-weight:500; color:var(--muted); line-height:1.2; }
+.time .tw { font-size:.72rem; font-weight:700; line-height:1.2; color:var(--neon-a); text-align:right; max-width:60px; }
+.tabbar { left:50%; right:auto; transform:translateX(-50%); width:calc(100% - 20px); max-width:720px; box-sizing:border-box; padding-right:52px; }
+.tabbar button.he { position:absolute; right:8px; top:50%; transform:translateY(-50%); flex:none; width:38px; height:38px; border-radius:50%; border:1px solid rgba(34,229,255,.5); background:rgba(18,15,38,.9); padding:0; gap:0; color:var(--neon-a); box-shadow:0 0 10px -2px var(--neon-a); }
+.tabbar button.he .ic { background:none !important; box-shadow:none !important; color:inherit !important; width:auto; height:auto; }
+.tabbar button.he .t { display:none; }
+.daymap .leaflet-tile-pane { filter:invert(1) hue-rotate(215deg) brightness(.9) contrast(1.05) saturate(1.7); }
 </style></head><body>
 <section class="leg" id="leg0">
 <header class="plate"><div class="kanji">日本</div><div class="pl-main"><h1>Japan 2026</h1><p>Harel &amp; Menashe &middot; Oct 21 &ndash; Nov 5</p></div></header>
@@ -1203,6 +1244,7 @@ $$(".chips button").forEach(function (b) {
   }
   btn.classList.toggle("on", he);
   btn.querySelector("span.t").textContent = he ? "English" : "עברית";
+  btn.querySelector("span.ic").textContent = he ? "EN" : "א";
   btn.onclick = function () {
     if (he) { setCookie("/en/en"); document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"; }
     else setCookie("/en/iw");
@@ -1242,4 +1284,17 @@ if ("serviceWorker" in navigator) {
   });
   window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
 }
+
+/* tidy times: fixed-width clock column, "~" and ranges moved to small side text */
+$$(".time").forEach(function (t) {
+  var s = t.textContent.trim(), m;
+  function pad(x) { return x.length < 5 ? "0" + x : x; }
+  if ((m = s.match(/^(~?)(\d{1,2}:\d{2})(?:-(\d{1,2}:\d{2}))?$/))) {
+    t.innerHTML = '<span class="tm' + (m[1] ? ' ap' : '') + '">' + pad(m[2]) + '</span>' + (m[3] ? '<span class="ts">to ' + pad(m[3]) + '</span>' : '');
+  } else if ((m = s.match(/^Before (\d{1,2}:\d{2})$/))) {
+    t.innerHTML = '<span class="tm">' + pad(m[1]) + '</span><span class="ts">before</span>';
+  } else {
+    t.innerHTML = '<span class="tw">' + s + '</span>';
+  }
+});
 </script></body></html>
