@@ -1,4 +1,4 @@
-var C = "jp26-e2bf30e0", PRE = ["./", "data/vendor/leaflet.js", "data/vendor/leaflet.css", "data/vendor/images/marker-icon.png", "data/vendor/images/marker-shadow.png", "data/vendor/images/layers.png"];
+var C = "jp26-e051426b", PRE = ["./", "data/vendor/leaflet.js", "data/vendor/leaflet.css", "data/vendor/images/marker-icon.png", "data/vendor/images/marker-shadow.png", "data/vendor/images/layers.png"];
 self.addEventListener("install", function (e) { e.waitUntil(caches.open(C).then(function (c) { return c.addAll(PRE); }).then(function () { return self.skipWaiting(); })); });
 self.addEventListener("activate", function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== C && k !== "jp26-rt"; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); })); });
 self.addEventListener("fetch", function (e) {

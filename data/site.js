@@ -212,4 +212,17 @@ $$(".chips button").forEach(function (b) {
   }
 })();
 
-if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+if ("serviceWorker" in navigator) {
+  var hadSW = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (!hadSW) { hadSW = true; return; }
+    if (document.getElementById("updbar")) return;
+    var b = document.createElement("button");
+    b.id = "updbar";
+    b.textContent = "New version available. Tap to reload";
+    b.style.cssText = "position:fixed;left:12px;right:12px;bottom:76px;z-index:9999;padding:12px;border:0;border-radius:10px;background:#222;color:#fff;font:600 15px sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.4)";
+    b.onclick = function () { location.reload(); };
+    document.body.appendChild(b);
+  });
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
