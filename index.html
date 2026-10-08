@@ -2,7 +2,6 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000"><title>Japan 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="data/vendor/leaflet.css">
 <style>:root {
   --bg:#000; --surface:#0d1017; --ink:#f2f4f8; --muted:#8f9bb0; --line:#1e2532; --soft:#161b26;
   --tab-h:64px; --font:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -501,7 +500,6 @@ body { padding-top:calc(var(--tab-h) + env(safe-area-inset-top) + 10px); padding
 <button id="heBtn" class="he"><span class="ic">א</span><span class="t">עברית</span></button>
 <div id="gte"></div>
 </nav>
-<script src="data/vendor/leaflet.js"></script>
 <script>
 // Saved restaurants, shops and sights. They appear on a day's map (toggle under the map)
 // when they are within ~1.2 km of that day's route, or within 1 km of your location after you tap "My location".
@@ -1012,7 +1010,20 @@ function km(a, b) {
 }
 
 /* ---- Maps: one per day, created when the day is first opened ---- */
-function buildMap(n, d) {
+var llState = 0, llQ = [];
+function withLeaflet(fn) {
+  if (window.L) return fn();
+  llQ.push(fn);
+  if (llState) return;
+  llState = 1;
+  var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "data/vendor/leaflet.css"; document.head.appendChild(l);
+  var s = document.createElement("script"); s.src = "data/vendor/leaflet.js";
+  s.onload = function () { var q = llQ; llQ = []; q.forEach(function (f) { f(); }); };
+  s.onerror = function () { llState = 0; };
+  document.head.appendChild(s);
+}
+function buildMap(n, d) { withLeaflet(function () { buildMap0(n, d); }); }
+function buildMap0(n, d) {
   var key = n + "-" + d, el = document.getElementById("l" + n + "-map" + d);
   if (!el || maps[key]) return;
   var leg = LEGS[n], hotel = leg.hotel, color = leg.colors[d], list = leg.stops[d];
@@ -1190,4 +1201,6 @@ $$(".chips button").forEach(function (b) {
     document.body.appendChild(s);
   }
 })();
+
+if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
 </script></body></html>

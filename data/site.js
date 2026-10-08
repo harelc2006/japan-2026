@@ -20,7 +20,20 @@ function km(a, b) {
 }
 
 /* ---- Maps: one per day, created when the day is first opened ---- */
-function buildMap(n, d) {
+var llState = 0, llQ = [];
+function withLeaflet(fn) {
+  if (window.L) return fn();
+  llQ.push(fn);
+  if (llState) return;
+  llState = 1;
+  var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "data/vendor/leaflet.css"; document.head.appendChild(l);
+  var s = document.createElement("script"); s.src = "data/vendor/leaflet.js";
+  s.onload = function () { var q = llQ; llQ = []; q.forEach(function (f) { f(); }); };
+  s.onerror = function () { llState = 0; };
+  document.head.appendChild(s);
+}
+function buildMap(n, d) { withLeaflet(function () { buildMap0(n, d); }); }
+function buildMap0(n, d) {
   var key = n + "-" + d, el = document.getElementById("l" + n + "-map" + d);
   if (!el || maps[key]) return;
   var leg = LEGS[n], hotel = leg.hotel, color = leg.colors[d], list = leg.stops[d];
@@ -198,3 +211,5 @@ $$(".chips button").forEach(function (b) {
     document.body.appendChild(s);
   }
 })();
+
+if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });

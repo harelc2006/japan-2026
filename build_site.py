@@ -179,7 +179,6 @@ html = '''<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000"><title>Japan 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="data/vendor/leaflet.css">
 <style>''' + CSS + '''</style></head><body>
 ''' + OVERVIEW + '\n' + '\n'.join(secs) + '''
 <nav class="tabbar" id="tabbar">
@@ -190,7 +189,25 @@ html = '''<!DOCTYPE html>
 <button id="heBtn" class="he"><span class="ic">א</span><span class="t">עברית</span></button>
 <div id="gte"></div>
 </nav>
-<script src="data/vendor/leaflet.js"></script>
 <script>
 ''' + PLACES + '\nvar LEGS = {};\n' + '\n'.join(datas) + '\n' + JS + '</script></body></html>'
 open('index.html', 'w', encoding='utf-8').write(html)
+
+# Service worker: precache the shell + Leaflet, cache tiles/fonts as they are viewed (offline use in Japan)
+import hashlib
+VER = hashlib.md5(html.encode('utf-8')).hexdigest()[:8]
+open('sw.js', 'w', encoding='utf-8').write('''var C = "jp26-%s", PRE = ["./", "data/vendor/leaflet.js", "data/vendor/leaflet.css", "data/vendor/images/marker-icon.png", "data/vendor/images/marker-shadow.png", "data/vendor/images/layers.png"];
+self.addEventListener("install", function (e) { e.waitUntil(caches.open(C).then(function (c) { return c.addAll(PRE); }).then(function () { return self.skipWaiting(); })); });
+self.addEventListener("activate", function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== C && k !== "jp26-rt"; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); })); });
+self.addEventListener("fetch", function (e) {
+  var r = e.request; if (r.method !== "GET") return;
+  var same = new URL(r.url).origin === location.origin;
+  e.respondWith(caches.match(r, { ignoreSearch: true }).then(function (hit) {
+    if (hit && same) return hit;
+    return fetch(r).then(function (res) {
+      if (res && (res.ok || res.type === "opaque")) { var cp = res.clone(); caches.open("jp26-rt").then(function (c) { c.put(r, cp); }); }
+      return res;
+    }).catch(function () { return hit || caches.match("./"); });
+  }));
+});
+''' % VER)
