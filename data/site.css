@@ -244,3 +244,4 @@ body { background:radial-gradient(900px 500px at 8% -8%,rgba(255,43,214,.20),tra
 .tabbar button.he .ic { background:none !important; box-shadow:none !important; color:inherit !important; width:auto; height:auto; }
 .tabbar button.he .t { display:none; }
 .daymap .leaflet-tile-pane { filter:invert(1) hue-rotate(215deg) brightness(.9) contrast(1.05) saturate(1.7); }
+.pn { color:#fff; border-color:var(--c); background:color-mix(in srgb,var(--c) 45%,#07060f); font-weight:900; font-size:13px; text-shadow:0 0 6px #000; box-shadow:0 0 10px -1px var(--c); }
